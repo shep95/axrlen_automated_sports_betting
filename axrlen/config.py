@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -9,6 +10,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+# Axrlen only trades weather + crypto markets resolving within 24 hours.
+ALLOWED_MARKET_CATEGORIES = frozenset({"weather", "crypto"})
+MAX_RESOLUTION_WINDOW_HOURS = 24
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 BRAINS_DIR = PROJECT_ROOT / "brains"
@@ -160,7 +167,14 @@ def load_settings() -> Settings:
         "MARKET_CATEGORIES",
         default="weather,crypto",
     )
-    categories = tuple(c.strip().lower() for c in categories_raw.split(",") if c.strip())
+    requested = [c.strip().lower() for c in categories_raw.split(",") if c.strip()]
+    skipped = [c for c in requested if c not in ALLOWED_MARKET_CATEGORIES]
+    if skipped:
+        logger.warning(
+            "Ignoring disallowed market categories (Axrlen is weather+crypto only): %s",
+            ", ".join(skipped),
+        )
+    categories = tuple(c for c in requested if c in ALLOWED_MARKET_CATEGORIES)
     if not categories:
         categories = ("weather", "crypto")
 
@@ -245,11 +259,14 @@ def load_settings() -> Settings:
             5,
             10,
         ),
-        resolution_window_hours=_env_int_aliases(
-            ("POLYMARKET_GAMMA_RESOLUTION_HOURS", "RESOLUTION_WINDOW_HOURS"),
-            24,
-            1,
-            168,
+        resolution_window_hours=min(
+            _env_int_aliases(
+                ("POLYMARKET_GAMMA_RESOLUTION_HOURS", "RESOLUTION_WINDOW_HOURS"),
+                MAX_RESOLUTION_WINDOW_HOURS,
+                1,
+                MAX_RESOLUTION_WINDOW_HOURS,
+            ),
+            MAX_RESOLUTION_WINDOW_HOURS,
         ),
         market_categories=categories,
         health_port=health_port,

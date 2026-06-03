@@ -64,3 +64,16 @@ def test_score_prefers_sooner_markets():
         volume=10000,
     )
     assert scanner.score_market(soon) > scanner.score_market(later)
+
+
+def test_sports_market_never_allowed():
+    scanner = MarketScanner(_settings())
+    sports = PolymarketMarket(
+        market_id="s1",
+        question="Will the Lakers win tonight?",
+        category=MarketCategory.SPORTS,
+        end_date=datetime.now(timezone.utc) + timedelta(hours=8),
+        outcomes=[PolymarketOutcome(name="Yes", price=0.55, token_id="y")],
+        enable_order_book=True,
+    )
+    assert not scanner._category_allowed(sports)

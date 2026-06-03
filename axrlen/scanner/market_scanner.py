@@ -5,8 +5,8 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timezone
 
-from axrlen.config import Settings
-from axrlen.models import PolymarketMarket
+from axrlen.config import ALLOWED_MARKET_CATEGORIES, Settings
+from axrlen.models import MarketCategory, PolymarketMarket
 from axrlen.polymarket.gamma_client import GammaClient
 
 logger = logging.getLogger(__name__)
@@ -20,8 +20,11 @@ class MarketScanner:
         self._gamma = gamma or GammaClient()
 
     def _category_allowed(self, market: PolymarketMarket) -> bool:
-        allowed = {c.lower() for c in self._settings.market_categories}
-        return market.category.value in allowed or "all" in allowed
+        cat = market.category.value
+        if cat not in ALLOWED_MARKET_CATEGORIES:
+            return False
+        configured = {c.lower() for c in self._settings.market_categories}
+        return cat in configured
 
     def _within_resolution_window(self, market: PolymarketMarket) -> bool:
         hours = market.hours_to_resolution
@@ -63,6 +66,9 @@ class MarketScanner:
         if not market.enable_order_book:
             stats["no_order_book"] += 1
             return
+        if market.category.value not in ALLOWED_MARKET_CATEGORIES:
+            stats["not_weather_or_crypto"] += 1
+            return
         if not self._category_allowed(market):
             stats["wrong_category"] += 1
             return
@@ -89,6 +95,7 @@ class MarketScanner:
         now = datetime.now(timezone.utc)
         stats = {
             "no_order_book": 0,
+            "not_weather_or_crypto": 0,
             "wrong_category": 0,
             "outside_window": 0,
             "already_ended": 0,
@@ -112,9 +119,11 @@ class MarketScanner:
 
         if not candidates:
             logger.info(
-                "Scan filters: no_order_book=%d wrong_category=%d outside_window=%d "
-                "already_ended=%d illiquid_price=%d | window=%dh categories=%s",
+                "Scan filters: no_order_book=%d not_weather_or_crypto=%d wrong_category=%d "
+                "outside_window=%d already_ended=%d illiquid_price=%d | "
+                "window=%dh (max 24h) categories=%s",
                 stats["no_order_book"],
+                stats["not_weather_or_crypto"],
                 stats["wrong_category"],
                 stats["outside_window"],
                 stats["already_ended"],

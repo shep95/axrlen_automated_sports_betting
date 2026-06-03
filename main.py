@@ -35,11 +35,13 @@ def main() -> None:
     ensure_data_dirs()
 
     logger.info(
-        "Axrlen Polymarket bot starting | paper=%s live=%s | interval=%dm | categories=%s",
+        "Axrlen Polymarket bot starting | paper=%s live=%s | interval=%dm | "
+        "categories=%s | resolution<=%dh (weather+crypto only)",
         settings.paper_trading,
         settings.is_live,
         settings.scan_interval_minutes,
         ",".join(settings.market_categories),
+        settings.resolution_window_hours,
     )
 
     start_health_server(settings.health_port)
