@@ -13,9 +13,10 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# Axrlen only trades weather + crypto markets resolving within 24 hours.
-ALLOWED_MARKET_CATEGORIES = frozenset({"weather", "crypto"})
-MAX_RESOLUTION_WINDOW_HOURS = 24
+# Legacy env var; scanner only targets BTC Up/Down ~5min markets (see btc_updown.py).
+ALLOWED_MARKET_CATEGORIES = frozenset({"crypto"})
+MAX_RESOLUTION_WINDOW_HOURS = 2
+DEFAULT_RESOLUTION_WINDOW_HOURS = 1
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 BRAINS_DIR = PROJECT_ROOT / "brains"
@@ -115,6 +116,27 @@ def _env_float_aliases(
     return default
 
 
+def _resolution_window_hours() -> float:
+    """How far out to accept market end times (BTC 5m windows are ~5–15 minutes)."""
+    minutes_raw = os.getenv("POLYMARKET_GAMMA_RESOLUTION_MINUTES", "").strip()
+    if minutes_raw:
+        try:
+            minutes = float(minutes_raw)
+        except ValueError as exc:
+            raise ValueError("POLYMARKET_GAMMA_RESOLUTION_MINUTES must be a number") from exc
+        if not 5 <= minutes <= 120:
+            raise ValueError("POLYMARKET_GAMMA_RESOLUTION_MINUTES must be between 5 and 120")
+        hours = minutes / 60.0
+    else:
+        hours = _env_float_aliases(
+            ("POLYMARKET_GAMMA_RESOLUTION_HOURS", "RESOLUTION_WINDOW_HOURS"),
+            DEFAULT_RESOLUTION_WINDOW_HOURS,
+            0.05,
+            MAX_RESOLUTION_WINDOW_HOURS,
+        )
+    return min(hours, MAX_RESOLUTION_WINDOW_HOURS)
+
+
 def _env_int_aliases(
     names: tuple[str, ...],
     default: int,
@@ -162,21 +184,9 @@ def load_settings() -> Settings:
                 "(wallet that signs orders — ClobClient `key`)"
             )
 
-    categories_raw = _env_str(
-        "POLYMARKET_GAMMA_MARKET_CATEGORIES",
-        "MARKET_CATEGORIES",
-        default="weather,crypto",
-    )
-    requested = [c.strip().lower() for c in categories_raw.split(",") if c.strip()]
-    skipped = [c for c in requested if c not in ALLOWED_MARKET_CATEGORIES]
-    if skipped:
-        logger.warning(
-            "Ignoring disallowed market categories (Axrlen is weather+crypto only): %s",
-            ", ".join(skipped),
-        )
-    categories = tuple(c for c in requested if c in ALLOWED_MARKET_CATEGORIES)
-    if not categories:
-        categories = ("weather", "crypto")
+    # Scanner ignores categories; kept for logs/compatibility.
+    categories = ("crypto",)
+    resolution_hours = _resolution_window_hours()
 
     port_raw = os.getenv("PORT", "").strip()
     health_port = _env_int("PORT", 8080, 1, 65535) if port_raw else _env_int_aliases(
@@ -255,19 +265,11 @@ def load_settings() -> Settings:
         ),
         scan_interval_minutes=_env_int_aliases(
             ("AXRLEN_SCAN_INTERVAL_MINUTES", "SCAN_INTERVAL_MINUTES"),
-            7,
-            5,
+            3,
+            2,
             10,
         ),
-        resolution_window_hours=min(
-            _env_int_aliases(
-                ("POLYMARKET_GAMMA_RESOLUTION_HOURS", "RESOLUTION_WINDOW_HOURS"),
-                MAX_RESOLUTION_WINDOW_HOURS,
-                1,
-                MAX_RESOLUTION_WINDOW_HOURS,
-            ),
-            MAX_RESOLUTION_WINDOW_HOURS,
-        ),
+        resolution_window_hours=resolution_hours,
         market_categories=categories,
         health_port=health_port,
         log_level=_env_str("AXRLEN_LOG_LEVEL", "LOG_LEVEL", default="INFO").upper(),

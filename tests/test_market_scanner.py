@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 from axrlen.config import Settings
 from axrlen.models import MarketCategory, PolymarketMarket, PolymarketOutcome
+from axrlen.scanner.btc_updown import is_btc_up_or_down_5min
 from axrlen.scanner.market_scanner import MarketScanner
 
 
@@ -66,14 +67,15 @@ def test_score_prefers_sooner_markets():
     assert scanner.score_market(soon) > scanner.score_market(later)
 
 
-def test_sports_market_never_allowed():
+def test_btc_updown_passes_scanner_filters():
     scanner = MarketScanner(_settings())
-    sports = PolymarketMarket(
-        market_id="s1",
-        question="Will the Lakers win tonight?",
-        category=MarketCategory.SPORTS,
-        end_date=datetime.now(timezone.utc) + timedelta(hours=8),
-        outcomes=[PolymarketOutcome(name="Yes", price=0.55, token_id="y")],
+    market = PolymarketMarket(
+        market_id="btc-5m",
+        question="Bitcoin Up or Down - 5 min?",
+        category=MarketCategory.CRYPTO,
+        end_date=datetime.now(timezone.utc) + timedelta(minutes=8),
+        outcomes=[PolymarketOutcome(name="Up", price=0.52, token_id="u")],
         enable_order_book=True,
     )
-    assert not scanner._category_allowed(sports)
+    assert is_btc_up_or_down_5min(market)
+    assert scanner._within_resolution_window(market)

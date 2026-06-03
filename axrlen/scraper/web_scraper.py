@@ -10,6 +10,7 @@ import httpx
 
 from axrlen.config import Settings
 from axrlen.models import MarketCategory, PolymarketMarket, ScrapedContext
+from axrlen.scanner.btc_updown import is_btc_up_or_down_5min
 
 logger = logging.getLogger(__name__)
 
@@ -175,15 +176,14 @@ class ContextScraper:
     def scrape(self, market: PolymarketMarket) -> list[ScrapedContext]:
         contexts: list[ScrapedContext] = []
 
-        if market.category == MarketCategory.WEATHER:
-            weather = self._fetch_weather(market)
-            if weather:
-                contexts.append(weather)
-
-        if market.category == MarketCategory.CRYPTO:
+        if is_btc_up_or_down_5min(market) or market.category == MarketCategory.CRYPTO:
             crypto = self._fetch_crypto(market)
             if crypto:
                 contexts.append(crypto)
+        elif market.category == MarketCategory.WEATHER:
+            weather = self._fetch_weather(market)
+            if weather:
+                contexts.append(weather)
 
         tavily = self._fetch_tavily(market)
         if tavily:

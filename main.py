@@ -36,11 +36,10 @@ def main() -> None:
 
     logger.info(
         "Axrlen Polymarket bot starting | paper=%s live=%s | interval=%dm | "
-        "categories=%s | resolution<=%dh (weather+crypto only)",
+        "target=BTC up/down 5min | resolution<=%.2fh",
         settings.paper_trading,
         settings.is_live,
         settings.scan_interval_minutes,
-        ",".join(settings.market_categories),
         settings.resolution_window_hours,
     )
 
