@@ -46,13 +46,30 @@ def _collect_brain_files(brains_dir: Path) -> list[Path]:
     return sorted(files, key=_priority_for)
 
 
-def load_brains(brains_dir: Path, max_chars: int = 250_000) -> str:
-    """
-    Load all brain files from brains_dir in Aureon manifest priority order.
+def load_simple_research_brain(brains_dir: Path) -> str:
+    """Lightweight brain for market research (no full Aureon corpus)."""
+    axrlen_brain = brains_dir / "axrlen_default_brain.txt"
+    if axrlen_brain.is_file():
+        try:
+            extra = _read_brain_file(axrlen_brain)
+            return f"{DEFAULT_BRAIN}\n\n{extra}"
+        except OSError as exc:
+            logger.warning("Could not read %s: %s", axrlen_brain, exc)
+    return DEFAULT_BRAIN
 
-    Files under brains/aureon/ are the imported Aureon corpus.
-    Files under brains/ root are Axrlen-specific overrides.
+
+def load_brains(brains_dir: Path, max_chars: int = 250_000, *, simple: bool = False) -> str:
     """
+    Load brain text for the AI system prompt.
+
+    simple=True: only Axrlen default rules (~fast, focused market research).
+    simple=False: full Aureon corpus up to max_chars.
+    """
+    if simple:
+        text = load_simple_research_brain(brains_dir)
+        logger.info("Loaded simple research brain (%d chars)", len(text))
+        return text
+
     if not brains_dir.is_dir():
         logger.warning("Brains directory missing: %s — using default brain", brains_dir)
         return DEFAULT_BRAIN

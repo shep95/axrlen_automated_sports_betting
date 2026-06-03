@@ -13,13 +13,23 @@ from openai import OpenAI
 from pydantic import ValidationError
 
 from axrlen.ai.brains_loader import load_brains
-from axrlen.ai.prompt_engine import build_workflow_question, format_market_context, format_scraped_context
+from axrlen.ai.prompt_engine import build_market_research_prompt, build_workflow_question
 from axrlen.config import Settings
 from axrlen.models import AIVerdict, BetDecision, PolymarketMarket, ScrapedContext, WorkflowQuestion
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_TEMPLATE = """<brains>
+SYSTEM_SIMPLE = """You are a Polymarket market research analyst.
+
+{brain}
+
+Rules:
+- Use only the MARKET and RESEARCH sections in the user message.
+- Compare real-world research to implied market odds.
+- Output JSON only: decision, confidence, answer, reasoning.
+- SKIP when data is weak or edge is unclear."""
+
+SYSTEM_FULL = """<brains>
 {brains}
 </brains>
 
@@ -91,7 +101,17 @@ class OpenAIDecisionGateway:
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
         self._client = OpenAI(api_key=settings.openai_api_key, timeout=settings.ai_timeout_seconds)
-        self._brains = load_brains(settings.brains_dir, max_chars=settings.brains_max_chars)
+        self._simple = settings.ai_research_simple
+        self._brains = load_brains(
+            settings.brains_dir,
+            max_chars=settings.brains_max_chars,
+            simple=self._simple,
+        )
+
+    def _system_prompt(self) -> str:
+        if self._simple:
+            return SYSTEM_SIMPLE.format(brain=self._brains)
+        return SYSTEM_FULL.format(brains=self._brains)
 
     def _build_user_prompt(
         self,
@@ -99,6 +119,11 @@ class OpenAIDecisionGateway:
         contexts: list[ScrapedContext],
         workflow: WorkflowQuestion,
     ) -> str:
+        if self._simple:
+            return build_market_research_prompt(market, contexts)
+
+        from axrlen.ai.prompt_engine import format_market_context, format_scraped_context
+
         return f"""<market>
 {format_market_context(market)}
 </market>
@@ -121,9 +146,9 @@ Answer the workflow question. JSON only."""
         correlation_id: str | None = None,
     ) -> AIVerdict:
         correlation_id = correlation_id or str(uuid.uuid4())
-        workflow = build_workflow_question(market)
+        workflow = build_workflow_question(market, simple=self._simple)
         user_prompt = self._build_user_prompt(market, contexts, workflow)
-        system_prompt = SYSTEM_TEMPLATE.format(brains=self._brains)
+        system_prompt = self._system_prompt()
 
         last_error = "unknown"
         for attempt in range(1, self._settings.max_ai_retries + 1):

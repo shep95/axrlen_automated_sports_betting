@@ -35,6 +35,7 @@ def _settings(**overrides):
         clob_api_passphrase="",
         brains_dir=__import__("pathlib").Path("brains"),
         brains_max_chars=250_000,
+        ai_research_simple=True,
         max_ai_retries=3,
         ai_timeout_seconds=60.0,
     )

@@ -173,7 +173,7 @@ curl http://localhost:8080/health
 | 2 | Set `OPENAI_API_KEY` in Railway variables |
 | 3 | Optional: `TAVILY_API_KEY` for richer web search |
 | 4 | Deploy — health check hits `/health` automatically |
-| 5 | Keep `PAPER_TRADING=true` until you've validated cycles |
+| 5 | Keep `POLYMARKET_CLOB_PAPER_TRADING=true` until you've validated cycles |
 
 Railway reads `railway.toml` + `Dockerfile`. The Aureon brains ship with the repo — no external brain mount required.
 
@@ -181,52 +181,71 @@ Railway reads `railway.toml` + `Dockerfile`. The Aureon brains ship with the rep
 
 ## Configuration
 
+See [`.env.example`](.env.example) for full comments. Names align with **Polymarket CLOB / Gamma** and **OpenAI** APIs.
+
 <details open>
-<summary><strong>Core</strong></summary>
+<summary><strong>OpenAI</strong></summary>
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENAI_API_KEY` | — | **Required** |
-| `OPENAI_MODEL` | `gpt-5.2` | Decision model |
-| `PAPER_TRADING` | `true` | Simulate bets |
-| `LIVE_TRADING` | `false` | Real CLOB orders |
-| `AXRLEN_CONFIRM_LIVE_RISK` | `false` | Must be `true` for live |
+| Variable | Default | Maps to |
+|----------|---------|---------|
+| `OPENAI_API_KEY` | — | OpenAI API key (**required**) |
+| `OPENAI_MODEL` | `gpt-5.2-chat-latest` | Chat Completions `model` |
 
 </details>
 
 <details>
-<summary><strong>Trading</strong></summary>
+<summary><strong>Polymarket CLOB</strong> (orders — <a href="https://docs.polymarket.com/trading/overview">docs</a>)</summary>
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `POLYMARKET_PRIVATE_KEY` | — | Wallet key (live) |
-| `POLYMARKET_FUNDER_ADDRESS` | — | Polymarket deposit address |
-| `BET_SIZE_USD` | `5` | Size per bet |
-| `MIN_CONFIDENCE` | `0.65` | Min AI confidence to act |
-| `MARKET_CATEGORIES` | `weather,crypto` | Scan targets |
+| Variable | Default | Maps to |
+|----------|---------|---------|
+| `POLYMARKET_CLOB_PAPER_TRADING` | `true` | Skip CLOB; simulate orders |
+| `POLYMARKET_CLOB_LIVE_TRADING` | `false` | Post real orders |
+| `POLYMARKET_CLOB_CONFIRM_LIVE_RISK` | `false` | Required `true` for live |
+| `POLYMARKET_SIGNER_PRIVATE_KEY` | — | `ClobClient` **`key`** (signs orders) |
+| `POLYMARKET_FUNDER_ADDRESS` | — | `ClobClient` **`funder`** (holds USDC) |
+| `POLYMARKET_SIGNATURE_TYPE` | `3` | `ClobClient` **`signature_type`** |
+| `POLYMARKET_CLOB_API_KEY` | — | `ApiCreds.api_key` (optional) |
+| `POLYMARKET_CLOB_API_SECRET` | — | `ApiCreds.api_secret` |
+| `POLYMARKET_CLOB_API_PASSPHRASE` | — | `ApiCreds.api_passphrase` |
+| `POLYMARKET_CLOB_ORDER_SIZE_USD` | `5` | Live order size (USDC) |
 
 </details>
 
 <details>
-<summary><strong>Timing & brains</strong></summary>
+<summary><strong>Polymarket Gamma</strong> (discovery — no API key)</summary>
+
+| Variable | Default | Maps to |
+|----------|---------|---------|
+| `POLYMARKET_GAMMA_MARKET_CATEGORIES` | `weather,crypto` | Market filter |
+| `POLYMARKET_GAMMA_RESOLUTION_HOURS` | `24` | Max hours until resolution |
+| `POLYMARKET_GAMMA_MAX_MARKETS_PER_SCAN` | `3` | Markets per cycle |
+
+</details>
+
+<details>
+<summary><strong>Axrlen paper bankroll & bot</strong></summary>
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `SCAN_INTERVAL_MINUTES` | `7` | Cycle interval (5–10 recommended) |
-| `RESOLUTION_WINDOW_HOURS` | `24` | Only markets ending within window |
-| `MAX_MARKETS_PER_CYCLE` | `3` | Markets evaluated per run |
-| `BRAINS_DIR` | `./brains` | Brain corpus path |
-| `BRAINS_MAX_CHARS` | `250000` | AI context budget |
+| `AXRLEN_PAPER_STARTING_CAPITAL_USD` | `100` | Simulated starting USDC |
+| `AXRLEN_PAPER_MIN_ORDER_USD` | `5` | Min paper order |
+| `AXRLEN_PAPER_MAX_ORDER_USD` | `50` | Max paper order |
+| `AXRLEN_PAPER_COMPOUND_AT_CAPITAL_USD` | `300` | Below: always min order |
+| `AXRLEN_AI_MIN_CONFIDENCE` | `0.65` | Min AI confidence to bet |
+| `AXRLEN_SCAN_INTERVAL_MINUTES` | `7` | Minutes between cycles |
+| `AXRLEN_AI_RESEARCH_SIMPLE` | `true` | Simple market-research prompt |
 | `TAVILY_API_KEY` | — | Optional web search |
 
 </details>
 
+Legacy names (`PAPER_TRADING`, `POLYMARKET_PRIVATE_KEY`, `CLOB_API_KEY`, etc.) still work.
+
 ### Go live checklist
 
-- [ ] Fund Polymarket wallet on Polygon
-- [ ] Set `POLYMARKET_PRIVATE_KEY` + `POLYMARKET_FUNDER_ADDRESS`
-- [ ] Set `LIVE_TRADING=true` · `PAPER_TRADING=false` · `AXRLEN_CONFIRM_LIVE_RISK=true`
-- [ ] Review [Polymarket CLOB V2 docs](https://docs.polymarket.com/trading/overview)
+- [ ] Fund Polymarket proxy (`POLYMARKET_FUNDER_ADDRESS`) with USDC on Polygon
+- [ ] Set `POLYMARKET_SIGNER_PRIVATE_KEY` + `POLYMARKET_FUNDER_ADDRESS`
+- [ ] Set `POLYMARKET_CLOB_LIVE_TRADING=true` · `POLYMARKET_CLOB_PAPER_TRADING=false` · `POLYMARKET_CLOB_CONFIRM_LIVE_RISK=true`
+- [ ] Review [Polymarket CLOB docs](https://docs.polymarket.com/trading/overview)
 
 ---
 
