@@ -6,7 +6,7 @@ from axrlen.ai.prompt_engine import build_market_research_prompt, build_workflow
 from axrlen.models import MarketCategory, PolymarketMarket, PolymarketOutcome, ScrapedContext
 
 
-def test_simple_workflow_uses_market_question():
+def test_simple_workflow_uses_one_line_question():
     market = PolymarketMarket(
         market_id="1",
         question="Will NYC high temperature exceed 85°F on June 4?",
@@ -15,7 +15,9 @@ def test_simple_workflow_uses_market_question():
         end_date=datetime.now(timezone.utc) + timedelta(hours=18),
     )
     workflow = build_workflow_question(market, simple=True)
-    assert workflow.question == market.question
+    assert workflow.question.startswith("Will ")
+    assert "happen" in workflow.question
+    assert "?" in workflow.question
 
 
 def test_research_prompt_includes_market_and_research():
@@ -31,6 +33,8 @@ def test_research_prompt_includes_market_and_research():
     )
     contexts = [ScrapedContext(source="coingecko", summary="BTC $95000, +2% 24h")]
     prompt = build_market_research_prompt(market, contexts)
+    assert "QUESTION" in prompt
+    assert "Simple question, simple answer" in prompt
     assert "MARKET" in prompt
     assert "RESEARCH" in prompt
     assert "Bitcoin" in prompt

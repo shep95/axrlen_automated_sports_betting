@@ -23,11 +23,17 @@ SYSTEM_SIMPLE = """You are a Polymarket market research analyst.
 
 {brain}
 
+Axrlen rule: simple question, simple answer.
+
 Rules:
-- Use only the MARKET and RESEARCH sections in the user message.
-- Compare real-world research to implied market odds.
-- Output JSON only: decision, confidence, answer, reasoning.
-- SKIP when data is weak or edge is unclear."""
+- Answer ONLY the QUESTION line in the user message.
+- Use only QUESTION, MARKET, and RESEARCH — ignore outside knowledge.
+- Compare research to market odds; bet YES or NO only when you see mispricing.
+- Output a single JSON object with keys: decision, confidence, answer, reasoning.
+- decision must be YES, NO, or SKIP (uppercase).
+- answer: one short sentence, no markdown.
+- reasoning: at most two short sentences.
+- No extra keys, no prose before or after JSON."""
 
 SYSTEM_FULL = """<brains>
 {brains}
@@ -95,6 +101,21 @@ def _normalize_decision(raw: str) -> BetDecision:
     return BetDecision.SKIP
 
 
+def _validate_simple_response(data: dict[str, Any]) -> str | None:
+    """Return error message if response breaks simple-answer rules."""
+    answer = str(data.get("answer", "")).strip()
+    reasoning = str(data.get("reasoning", "")).strip()
+    if not answer:
+        return "empty answer"
+    if "```" in answer or "\n-" in answer or answer.count(".") > 2:
+        return "answer must be one short sentence"
+    if len(answer) > 220:
+        return "answer too long"
+    if len(reasoning) > 400:
+        return "reasoning too long (max ~2 sentences)"
+    return None
+
+
 class OpenAIDecisionGateway:
     """Provider-agnostic AI gateway (OpenAI implementation)."""
 
@@ -120,7 +141,9 @@ class OpenAIDecisionGateway:
         workflow: WorkflowQuestion,
     ) -> str:
         if self._simple:
-            return build_market_research_prompt(market, contexts)
+            return build_market_research_prompt(
+                market, contexts, workflow_question=workflow.question
+            )
 
         from axrlen.ai.prompt_engine import format_market_context, format_scraped_context
 
@@ -169,6 +192,19 @@ Answer the workflow question. JSON only."""
                     logger.warning("[%s] AI JSON parse failed attempt %d", correlation_id, attempt)
                     time.sleep(min(2 ** attempt, 8))
                     continue
+
+                if self._simple:
+                    validation_error = _validate_simple_response(data)
+                    if validation_error:
+                        last_error = validation_error
+                        logger.warning(
+                            "[%s] AI response format rejected attempt %d: %s",
+                            correlation_id,
+                            attempt,
+                            validation_error,
+                        )
+                        time.sleep(min(2 ** attempt, 8))
+                        continue
 
                 decision = _normalize_decision(str(data.get("decision", "SKIP")))
                 try:

@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timezone
 
 from axrlen.config import Settings
-from axrlen.models import MarketCategory, PolymarketMarket
+from axrlen.models import PolymarketMarket
 from axrlen.polymarket.gamma_client import GammaClient
 
 logger = logging.getLogger(__name__)
@@ -29,8 +29,8 @@ class MarketScanner:
             return False
         return 0 < hours <= self._settings.resolution_window_hours
 
-    def _is_almost_completed(self, market: PolymarketMarket) -> bool:
-        """Prefer markets where one side is heavily priced but still tradable."""
+    def _passes_liquidity_price_filter(self, market: PolymarketMarket) -> bool:
+        """Skip only dead markets (no real two-sided book)."""
         if not market.outcomes:
             return True
         prices = [o.price for o in market.outcomes if o.price > 0]
@@ -38,8 +38,8 @@ class MarketScanner:
             return True
         max_price = max(prices)
         min_price = min(prices)
-        # Near resolution: strong consensus OR tight window
-        return max_price >= 0.55 or (max_price - min_price) >= 0.10
+        # Reject only if both sides are extreme longshots (no tradeable book)
+        return max_price >= 0.08 and min_price >= 0.02
 
     def score_market(self, market: PolymarketMarket) -> float:
         hours = market.hours_to_resolution or 999.0
@@ -53,27 +53,53 @@ class MarketScanner:
                 consensus = max(prices) - min(prices)
         return urgency * 2.0 + liquidity_score + volume_score + consensus
 
+    def _try_add(
+        self,
+        market: PolymarketMarket,
+        candidates: list[PolymarketMarket],
+        now: datetime,
+        stats: dict[str, int],
+    ) -> None:
+        if not market.enable_order_book:
+            stats["no_order_book"] += 1
+            return
+        if not self._category_allowed(market):
+            stats["wrong_category"] += 1
+            return
+        if not self._within_resolution_window(market):
+            stats["outside_window"] += 1
+            return
+        if market.end_date and market.end_date <= now:
+            stats["already_ended"] += 1
+            return
+        if not self._passes_liquidity_price_filter(market):
+            stats["illiquid_price"] += 1
+            return
+        if market.market_id in {m.market_id for m in candidates}:
+            stats["duplicate"] += 1
+            return
+        stats["passed"] += 1
+        candidates.append(market)
+
     def scan(self) -> list[PolymarketMarket]:
         raw_markets = self._gamma.fetch_markets(limit=150)
         logger.info("Fetched %d markets from Gamma API", len(raw_markets))
 
         candidates: list[PolymarketMarket] = []
         now = datetime.now(timezone.utc)
+        stats = {
+            "no_order_book": 0,
+            "wrong_category": 0,
+            "outside_window": 0,
+            "already_ended": 0,
+            "illiquid_price": 0,
+            "duplicate": 0,
+            "passed": 0,
+        }
 
         for market in raw_markets:
-            if not market.enable_order_book:
-                continue
-            if not self._category_allowed(market):
-                continue
-            if not self._within_resolution_window(market):
-                continue
-            if market.end_date and market.end_date <= now:
-                continue
-            if not self._is_almost_completed(market):
-                continue
-            candidates.append(market)
+            self._try_add(market, candidates, now, stats)
 
-        # Category-specific search boost (weather, crypto short-term)
         for category in self._settings.market_categories:
             query = f"{category} tomorrow"
             try:
@@ -82,13 +108,20 @@ class MarketScanner:
                 logger.warning("Search failed for %s: %s", query, exc)
                 continue
             for market in searched:
-                if market.market_id in {m.market_id for m in candidates}:
-                    continue
-                if not self._category_allowed(market):
-                    continue
-                if not self._within_resolution_window(market):
-                    continue
-                candidates.append(market)
+                self._try_add(market, candidates, now, stats)
+
+        if not candidates:
+            logger.info(
+                "Scan filters: no_order_book=%d wrong_category=%d outside_window=%d "
+                "already_ended=%d illiquid_price=%d | window=%dh categories=%s",
+                stats["no_order_book"],
+                stats["wrong_category"],
+                stats["outside_window"],
+                stats["already_ended"],
+                stats["illiquid_price"],
+                self._settings.resolution_window_hours,
+                ",".join(self._settings.market_categories),
+            )
 
         ranked = sorted(candidates, key=self.score_market, reverse=True)
         selected = ranked[: self._settings.max_markets_per_cycle]

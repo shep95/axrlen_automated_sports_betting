@@ -42,6 +42,32 @@ class WorkflowPipeline:
         correlation_id = str(uuid.uuid4())
         logger.info("[%s] Processing: %s", correlation_id, market.question[:100])
 
+        if self._trader.has_open_market(market.market_id):
+            logger.info(
+                "[%s] Skipping — already in open trade on market %s",
+                correlation_id,
+                market.market_id,
+            )
+            bankroll = (
+                self._trader.paper_bankroll.snapshot()
+                if self._trader.paper_bankroll
+                else None
+            )
+            record = {
+                "correlation_id": correlation_id,
+                "market_id": market.market_id,
+                "question": market.question,
+                "category": market.category.value,
+                "skipped": True,
+                "skip_reason": "open_position_exists",
+                "bet_success": False,
+                "bet_paper": True,
+                "bet_message": "Already in open trade on this market",
+                "bankroll": bankroll,
+            }
+            self._journal(record)
+            return record
+
         contexts = self._scraper.scrape(market)
         verdict = self._ai.decide(market, contexts, correlation_id=correlation_id)
 
@@ -88,6 +114,22 @@ class WorkflowPipeline:
         markets = self._scanner.scan()
         if not markets:
             logger.info("No qualifying markets this cycle")
+            return []
+
+        open_ids = self._trader.open_market_ids()
+        if open_ids:
+            before = len(markets)
+            markets = [m for m in markets if m.market_id not in open_ids]
+            skipped = before - len(markets)
+            if skipped:
+                logger.info(
+                    "Excluded %d market(s) already in open trades: %s",
+                    skipped,
+                    ", ".join(sorted(open_ids)[:5]),
+                )
+
+        if not markets:
+            logger.info("No new markets to process (all candidates already have open trades)")
             return []
 
         results = []

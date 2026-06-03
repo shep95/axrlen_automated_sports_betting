@@ -194,6 +194,16 @@ class PaperBankroll:
                 "open_positions": len(self._state.open_positions),
             }
 
+    def open_market_ids(self) -> set[str]:
+        with self._lock:
+            return {p.market_id for p in self._state.open_positions if p.market_id}
+
+    def has_open_position(self, market_id: str) -> bool:
+        if not market_id:
+            return False
+        with self._lock:
+            return any(p.market_id == market_id for p in self._state.open_positions)
+
     def log_summary(self, *, context: str = "SUMMARY") -> None:
         snap = self.snapshot()
         logger.info(
@@ -295,6 +305,15 @@ class PaperBankroll:
                     market.question[:80],
                 )
                 return 0.0, {**snap, "rejected": True, "reason": "insufficient_capital"}
+
+            if any(p.market_id == market.market_id for p in self._state.open_positions):
+                logger.info(
+                    "%s BET REJECTED | already in open trade | market_id=%s | %s",
+                    _LOG_PREFIX,
+                    market.market_id,
+                    market.question[:80],
+                )
+                return 0.0, {**snap, "rejected": True, "reason": "open_position_exists"}
 
             shares = stake / price
             position_id = f"{market.market_id}:{correlation_id}"

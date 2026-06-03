@@ -1,4 +1,4 @@
-"""Market research prompts — clear brief for the AI."""
+"""Market research prompts — simple question, simple answer."""
 
 from __future__ import annotations
 
@@ -9,7 +9,12 @@ from axrlen.models import PolymarketMarket, ScrapedContext, WorkflowQuestion
 
 def _strip_question_prefix(text: str) -> str:
     cleaned = text.strip()
-    cleaned = re.sub(r"^(will|does|is|are|can|could|should)\s+", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(
+        r"^(will|does|is|are|can|could|should)\s+",
+        "",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
     return cleaned.rstrip("?").strip()
 
 
@@ -25,21 +30,30 @@ def _extract_subject(keywords: list[str], question: str) -> str:
 def _timeframe_label(market: PolymarketMarket) -> str:
     hours = market.hours_to_resolution
     if hours is None:
-        return "soon"
+        return "before resolution"
+    if hours <= 12:
+        return "today"
     if hours <= 24:
-        return "tomorrow" if hours > 12 else "today"
+        return "tomorrow"
     days = int(hours // 24)
     return f"within {days} day{'s' if days != 1 else ''}"
 
 
+def build_simple_question(market: PolymarketMarket) -> str:
+    """One-line yes/no question for the AI (Axrlen workflow)."""
+    event = _strip_question_prefix(market.question)
+    timeframe = _timeframe_label(market)
+    return f"Will {event} happen {timeframe}?"
+
+
 def build_workflow_question(market: PolymarketMarket, *, simple: bool = True) -> WorkflowQuestion:
-    """Research question stored for logs and journal."""
+    """Workflow question stored in logs and journal."""
     event = _strip_question_prefix(market.question)
     subject = _extract_subject(market.keywords, market.question)
     timeframe = _timeframe_label(market)
 
     if simple:
-        question = market.question.strip()
+        question = build_simple_question(market)
     else:
         question = f"Do you think {subject} that {event} will happen {timeframe}?"
 
@@ -78,25 +92,34 @@ def format_research_notes(contexts: list[ScrapedContext]) -> str:
     return "\n".join(f"- {ctx.source}: {ctx.summary}" for ctx in contexts)
 
 
-def build_market_research_prompt(market: PolymarketMarket, contexts: list[ScrapedContext]) -> str:
-    """Single user message: market + research + decision task."""
-    return f"""MARKET
+def build_market_research_prompt(
+    market: PolymarketMarket,
+    contexts: list[ScrapedContext],
+    *,
+    workflow_question: str | None = None,
+) -> str:
+    """Single user message: one question, market facts, research, strict JSON answer."""
+    question = workflow_question or build_simple_question(market)
+    return f"""QUESTION (answer this only):
+{question}
+
+MARKET
 {format_market_snapshot(market)}
 
 RESEARCH
 {format_research_notes(contexts)}
 
-TASK
-Compare the research to the market odds. Is the market mispriced?
-- YES = event is more likely than the price suggests
-- NO = event is less likely than the price suggests
-- SKIP = not enough data or no clear edge
+RULES
+- Simple question, simple answer.
+- decision must be exactly YES, NO, or SKIP (bet the market Yes/No side accordingly).
+- answer = one short plain sentence (no markdown, no lists).
+- reasoning = maximum two short sentences.
+- SKIP if research is missing, conflicting, or no edge vs market odds.
 
-Return only JSON:
-{{"decision":"YES"|"NO"|"SKIP","confidence":0.0-1.0,"answer":"one sentence","reasoning":"max 2 sentences"}}"""
+Return only this JSON object, nothing else:
+{{"decision":"YES"|"NO"|"SKIP","confidence":0.0-1.0,"answer":"one sentence","reasoning":"max two sentences"}}"""
 
 
-# Backward-compatible aliases
 def format_market_context(market: PolymarketMarket) -> str:
     return format_market_snapshot(market)
 

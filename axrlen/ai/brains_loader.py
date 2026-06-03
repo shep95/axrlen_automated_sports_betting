@@ -10,16 +10,11 @@ from axrlen.ai.aureon_manifest import AUREON_PRIORITY
 logger = logging.getLogger(__name__)
 
 DEFAULT_BRAIN = """
-You are Axrlen, an Aureon-trained Polymarket decision agent.
-
-Rules:
+Axrlen rules:
 - Simple question, simple answer.
-- Follow Aureon hard constraints and anti-spiral protocol when evaluating evidence.
-- Use ONLY the provided market data and scraped context.
-- Answer YES if evidence supports the event happening within the stated timeframe.
-- Answer NO if evidence suggests it will not happen.
-- Answer SKIP if data is insufficient or ambiguous.
-- Be calibrated: high confidence only when evidence is strong.
+- Use ONLY the QUESTION, MARKET, and RESEARCH in the user message.
+- YES = event likely vs market odds; NO = unlikely; SKIP = no edge or weak data.
+- One-sentence answer; at most two sentences of reasoning.
 """.strip()
 
 SUPPORTED_SUFFIXES = {".txt", ".md"}
