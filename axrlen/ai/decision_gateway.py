@@ -91,7 +91,7 @@ class OpenAIDecisionGateway:
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
         self._client = OpenAI(api_key=settings.openai_api_key, timeout=settings.ai_timeout_seconds)
-        self._brains = load_brains(settings.brains_dir)
+        self._brains = load_brains(settings.brains_dir, max_chars=settings.brains_max_chars)
 
     def _build_user_prompt(
         self,

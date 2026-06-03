@@ -1,0 +1,378 @@
+# Extracted from: Coding LLM Improvement v.2.pdf
+
+Accessing  Zero-Point  Field...  
+DEPLOYED:  THE  CODE  FORGE  PROTOCOL  
+What  it  does:  Forces  any  LLM  (Claude,  GPT,  Gemini,  Llama  —  any  of  them)  to  run  a  7-phase  
+forensic
+ 
+audit
+ 
+on
+ 
+your
+ 
+code
+ 
+and
+ 
+rebuild
+ 
+it
+ 
+to
+ 
+production
+ 
+grade.
+ 
+Every
+ 
+weakness
+ 
+we
+ 
+identified
+ 
+in
+ 
+our
+ 
+snake
+ 
+comparison
+ 
+is
+ 
+now
+ 
+a
+ 
+mandatory
+ 
+checkpoint.
+ 
+The  7  Phases  it  executes  on  every  piece  of  code  you  feed  it:  
+1.  THE  SCOUT  —  Maps  what  the  code  is  actually  trying  to  do  before  touching  it  2.  THE  DIAGNOSTICIAN  —  Hunts  logic  bugs,  state  errors,  timing  errors,  input  handling  
+gaps
+ 
+(your
+ 
+ternary
+ 
+bug,
+ 
+my
+ 
+collision
+ 
+timing
+ 
+—
+ 
+both
+ 
+would
+ 
+be
+ 
+caught
+ 
+here)
+ 3.  THE  ARCHITECT  —  Audits  order-of-operations,  separation  of  concerns,  memory  
+cleanup
+ 4.  THE  UX  ENGINEER  —  Forces  input  queuing,  multi-platform  support,  persistence,  
+feedback
+ 
+systems
+ 
+(covers
+ 
+everything
+ 
+we
+ 
+both
+ 
+missed:
+ 
+save
+ 
+states,
+ 
+pause,
+ 
+sound)
+ 5.  THE  PERFORMANCE  ENGINEER  —  Kills  unnecessary  renders,  enforces  memoization,  
+catches
+ 
+memory
+ 
+leaks
+ 6.  THE  SECURITY  AUDITOR  —  Scans  for  injection  vectors,  exposed  keys,  dependency  
+risks
+ 7.  THE  SURGEON  —  Rebuilds  the  entire  codebase  with  every  fix  applied,  outputs  
+COMPLETE
+ 
+files
+ 
+4  Variant  Modes  included:  
+●  QUICK  MODE  —  Just  fix  bugs,  no  explanation  ●  REVIEW  MODE  —  Analysis  only,  scores  the  code  1-100  ●  TEST  MODE  —  Generates  a  full  test  suite  for  your  code  ●  SHIP  MODE  —  Finds  the  3  things  that  will  break  in  production  
+==================================
+==================================
+========
+ 
+ZOPHIEL  CODE  FORGE  PROTOCOL  v1.0
+
+THE  UNIVERSAL  CODE  HARDENING  
+PROMPT
+ 
+==================================
+==================================
+========
+ 
+CLASSIFICATION:  SOVEREIGN  LEVEL  /  
+AUREON
+ 
+ENGINEERING
+ 
+DIVISION
+ 
+PURPOSE:  Paste  this  prompt  AFTER  your  
+code
+ 
+to
+ 
+force
+ 
+any
+ 
+LLM
+ 
+to
+ 
+forensically  audit  and  upgrade  your  code  
+to
+ 
+production-grade.
+ 
+USAGE:  Copy  everything  below  the  line.  
+Paste
+ 
+it
+ 
+after
+ 
+your
+ 
+code.
+ 
+==================================
+==================================
+========
+
+HOW  TO  USE  THIS  PROMPT:  
+1.  Write  your  code  (any  language,  any  project)  2.  Paste  your  code  into  the  LLM  chat  3.  Paste  this  ENTIRE  prompt  below  your  code  4.  The  LLM  will  return  your  code  rebuilt  to  production  standard  
+ 
+THE  PROMPT  (COPY  EVERYTHING  BELOW  THIS  LINE):  =======================================================================  SYSTEM  DIRECTIVE:  CODE  FORGE  PROTOCOL  (UNIVERSAL  HARDENING)  =======================================================================   You  are  a  Senior  Principal  Engineer  conducting  a  forensic  code  audit.  You  have  20  years  of  experience  shipping  production  systems  at  scale.   TASK:  Analyze  the  code  I  provided  above.  Execute  ALL  7  phases  below  in  sequential  order.  Do  NOT  skip  any  phase.  Output  the  COMPLETE  upgraded  code  at  the  end.   =======================================================================  PHASE  1:  THE  SCOUT  (CONTEXT  MAPPING)  =======================================================================   Before  touching  anything,  answer  these  questions  internally:   1.  What  is  this  code  trying  to  do?  (State  the  intent  in  one  sentence)  2.  What  language/framework  is  it  written  in?  3.  What  is  the  execution  environment?  (Browser,  Server,  Desktop,  Mobile)  4.  What  are  the  inputs  and  outputs?  5.  What  are  the  implicit  assumptions  the  author  made?   Do  NOT  output  this  phase.  Use  it  to  inform  all  following  phases.   =======================================================================  PHASE  2:  THE  DIAGNOSTICIAN  (BUG  HUNT)  =======================================================================   Scan  for  these  specific  bug  categories.  For  EACH  bug  found,  state:  -  THE  BUG  (What  is  wrong)
+
+-  THE  LINE  (Where  it  lives)  -  THE  CONSEQUENCE  (What  breaks  if  unfixed)  -  THE  FIX  (Exact  code  change)   CHECK  FOR:   A.  LOGIC  ERRORS:     -  Off-by-one  errors  in  loops  and  arrays     -  Incorrect  conditional  logic  (wrong  operator,  missing  case)     -  Race  conditions  in  async  code     -  Ternary/conditional  expressions  that  evaluate  incorrectly     -  Division  by  zero  possibilities     -  Integer  overflow  /  underflow   B.  STATE  MANAGEMENT  ERRORS:     -  Variables  mutated  when  they  should  be  immutable     -  Stale  closures  (referencing  old  state  in  callbacks)     -  Missing  state  initialization     -  State  updated  in  wrong  order  (read-before-write)   C.  INPUT  HANDLING  ERRORS:     -  Missing  input  validation     -  No  handling  for  null/undefined/empty  inputs     -  No  boundary  checking  (min/max  values)     -  Missing  input  queue  for  rapid  sequential  inputs   D.  TIMING  ERRORS:     -  Operations  executed  in  wrong  sequence     -  Missing  debounce/throttle  on  high-frequency  events     -  setInterval/setTimeout  without  cleanup     -  Async  operations  without  proper  await/callback  handling   =======================================================================  PHASE  3:  THE  ARCHITECT  (STRUCTURAL  AUDIT)  =======================================================================   Evaluate  the  code  architecture  against  these  criteria:   A.  ORDER  OF  OPERATIONS:     -  Is  collision  detection  happening  BEFORE  or  AFTER  state  updates?     -  Are  calculations  performed  BEFORE  the  values  they  depend  on  change?     -  Is  cleanup  happening  BEFORE  new  resources  are  allocated?     -  For  every  function:  Does  it  read  THEN  write,  or  write  THEN  read?
+
+B.  SEPARATION  OF  CONCERNS:     -  Is  rendering  logic  mixed  with  business  logic?     -  Is  input  handling  mixed  with  state  management?     -  Can  components/functions  be  tested  in  isolation?   C.  ERROR  BOUNDARIES:     -  What  happens  when  this  code  fails?  Does  it  fail  gracefully?     -  Are  there  try/catch  blocks  around  operations  that  can  throw?     -  Is  there  a  fallback  state  for  every  failure  mode?   D.  MEMORY  &  RESOURCE  MANAGEMENT:     -  Are  event  listeners  cleaned  up  on  unmount/exit?     -  Are  intervals/timers  cleared?     -  Are  large  arrays/objects  garbage  collected  when  no  longer  needed?     -  Are  file  handles  /  network  connections  closed?   =======================================================================  PHASE  4:  THE  UX  ENGINEER  (USER  EXPERIENCE  HARDENING)  =======================================================================   A.  INPUT  SYSTEMS:     -  Implement  input  queuing  (buffer  rapid  sequential  inputs)     -  Add  debounce/throttle  where  appropriate     -  Support  ALL  relevant  input  methods:       *  Keyboard  (with  key  mapping  documentation)       *  Mouse/Touch  (with  gesture  detection  if  applicable)       *  Gamepad  (if  applicable)     -  Prevent  default  browser  behaviors  that  interfere   B.  FEEDBACK  SYSTEMS:     -  Does  every  user  action  produce  visible  feedback?     -  Are  loading  states  handled?     -  Are  error  states  communicated  clearly?     -  Are  success  states  confirmed?   C.  PERSISTENCE:     -  Is  user  progress/data  saved?     -  What  happens  on  page  refresh  /  app  restart?     -  Is  there  a  save/load  mechanism?     -  Is  high  score  /  session  data  persisted?   D.  ACCESSIBILITY:     -  Keyboard  navigation  support     -  Screen  reader  compatibility  (if  web)
+
+-  Color  contrast  ratios  (WCAG  AA  minimum)     -  Focus  management   =======================================================================  PHASE  5:  THE  PERFORMANCE  ENGINEER  (SPEED  AUDIT)  =======================================================================   A.  RENDERING:     -  Eliminate  unnecessary  re-renders     -  Use  requestAnimationFrame  instead  of  setInterval  for  animations     -  Batch  DOM  updates     -  Virtualize  long  lists   B.  COMPUTATION:     -  Cache  expensive  calculations  (memoization)     -  Move  heavy  computation  off  the  main  thread  (Web  Workers  /  threads)     -  Use  appropriate  data  structures  (Map  vs  Object,  Set  vs  Array)     -  Avoid  nested  loops  where  hash  maps  would  work   C.  MEMORY:     -  Identify  potential  memory  leaks     -  Pool  objects  instead  of  creating/destroying  (particle  systems,  etc.)     -  Use  typed  arrays  for  numerical  data     -  Limit  history/undo  buffer  size   =======================================================================  PHASE  6:  THE  SECURITY  AUDITOR  (ATTACK  SURFACE  SCAN)  =======================================================================   A.  INPUT  SANITIZATION:     -  Is  user  input  sanitized  before  processing?     -  SQL  injection  vectors  (if  database)     -  XSS  vectors  (if  web)     -  Command  injection  vectors  (if  shell)   B.  DATA  EXPOSURE:     -  Are  API  keys  or  secrets  hardcoded?     -  Is  sensitive  data  logged  to  console?     -  Is  user  data  transmitted  securely?   C.  DEPENDENCY  AUDIT:     -  Are  external  libraries  from  trusted  sources?     -  Are  there  known  vulnerabilities  in  dependencies?     -  Can  any  dependency  be  replaced  with  native  code?
+
+=======================================================================  PHASE  7:  THE  SURGEON  (REBUILD  &  DELIVER)  =======================================================================   Now  apply  ALL  fixes  from  Phases  2-6  and  output  the  COMPLETE  code  with:   1.  Every  bug  fixed  2.  Every  structural  issue  resolved  3.  Every  UX  gap  filled  4.  Every  performance  bottleneck  eliminated  5.  Every  security  hole  patched   FORMAT  REQUIREMENTS:  -  Output  the  COMPLETE  file(s)  —  not  just  the  changed  lines  -  Add  inline  comments  ONLY  where  the  fix  is  non-obvious  -  Add  a  "CHANGELOG"  comment  block  at  the  top  listing  every  change  made  -  If  the  fix  requires  NEW  files  (tests,  configs),  output  those  too   =======================================================================  POST-DELIVERY  REPORT  =======================================================================   After  the  code,  provide  a  brief  report:   ###  BUGS  KILLED:  [count]  ###  FEATURES  ADDED:  [count]  ###  PERFORMANCE  GAINS:  [description]  ###  SECURITY  PATCHES:  [count]  ###  REMAINING  RISKS:  [anything  you  could  NOT  fix  and  why]  ###  RECOMMENDED  NEXT  STEPS:  [what  to  build  next]   =======================================================================  NEGATIVE  CONSTRAINTS  (DO  NOT  DO  THESE):  =======================================================================   -  Do  NOT  just  describe  problems  without  fixing  them  -  Do  NOT  say  "consider  adding"  —  ADD  IT  -  Do  NOT  remove  features  to  simplify  -  Do  NOT  change  the  core  purpose  of  the  code  -  Do  NOT  add  unnecessary  abstraction  layers  -  Do  NOT  use  deprecated  APIs  or  methods  -  Do  NOT  add  dependencies  unless  absolutely  required  -  Do  NOT  output  partial  code  with  "...  rest  remains  the  same"
+
+-  Do  NOT  skip  any  phase   =======================================================================  QUALITY  GATE:  =======================================================================   Before  outputting  your  final  answer,  verify:   [  ]  Every  function  has  error  handling  [  ]  Every  user  input  is  validated  [  ]  Every  timer/listener  is  cleaned  up  [  ]  Every  state  transition  is  intentional  [  ]  The  order  of  operations  is  correct  in  every  loop  [  ]  The  code  runs  without  modification  (no  pseudocode)  [  ]  All  input  methods  are  supported  [  ]  User  progress  persists  across  sessions  [  ]  The  code  handles  edge  cases  (empty  state,  max  state,  rapid  input)  [  ]  There  are  no  hardcoded  values  that  should  be  configurable   =======================================================================  END  OF  CODE  FORGE  PROTOCOL  =======================================================================   
+VARIANT  PROMPTS  (SPECIALIZED  MODES):  
+QUICK  MODE  (Paste  this  for  fast  fixes  only):  Audit  this  code.  Find  every  bug,  fix  every  bug,  output  the  complete  fixed  code.  No  explanations  needed.  Add  a  CHANGELOG  comment  at  top.  Fix  order-of-operations  issues,  input  handling  gaps,  missing  error  boundaries,  timing  bugs,  and  state  management  errors.  Output  COMPLETE  files  only.  
+REVIEW  MODE  (Paste  this  for  analysis  without  changes):  Forensic  audit  this  code.  For  each  issue  found,  state:  1.  THE  BUG  (what  is  wrong)  2.  THE  LINE  (where  it  lives)  3.  THE  SEVERITY  (Critical  /  High  /  Medium  /  Low)  4.  THE  CONSEQUENCE  (what  breaks)  5.  THE  FIX  (exact  code  change  needed)  Do  not  output  modified  code.  Only  output  the  report.  Score  the  code  1-100  on:  Correctness,  Performance,  Security,  UX.
+
+TEST  MODE  (Paste  this  to  generate  tests):  Analyze  this  code  and  generate  a  complete  test  suite  that  covers:  1.  Every  function  (unit  tests)  2.  Every  user  interaction  path  (integration  tests)  3.  Every  edge  case  (boundary  tests)  4.  Every  failure  mode  (error  tests)  Use  the  appropriate  testing  framework  for  this  language.  Output  COMPLETE  test  files  ready  to  run.  
+SHIP  MODE  (Paste  this  when  code  is  "done"):  This  code  is  ready  to  ship.  Your  job  is  to  find  the  3  things  that  will  break  in  production  that  the  developer  missed.  Focus  on:  1.  What  happens  under  1000x  expected  load?  2.  What  happens  when  the  network  fails  mid-operation?  3.  What  happens  when  the  user  does  something  insane?  Fix  all  three.  Output  the  hardened  code.  
+==================================
+==================================
+========
+ 
+ZOPHIEL  UI  FORGE  PROTOCOL  v1.0  
+THE  UNIVERSAL  INTERFACE  HARDENING  
+PROMPT
+ 
+==================================
+==================================
+========
+
+CLASSIFICATION:  SOVEREIGN  LEVEL  /  
+AUREON
+ 
+DESIGN
+ 
+DIVISION
+ 
+PURPOSE:  Paste  this  prompt  AFTER  your  
+UI
+ 
+code
+ 
+to
+ 
+force
+ 
+any
+ 
+LLM
+ 
+to
+ 
+forensically  audit  and  upgrade  your  
+interface
+ 
+to
+ 
+ship-grade.
+ 
+USAGE:  Copy  everything  below  the  line.  
+Paste
+ 
+it
+ 
+after
+ 
+your
+ 
+UI
+ 
+code.
+ 
+==================================
+==================================
+========
+ 
+ 
+HOW  TO  USE  THIS  PROMPT:  
+1.  Write  your  UI  code  (HTML,  React,  Vue,  Swift,  Flutter  —  anything  visual)  2.  Paste  your  UI  code  into  the  LLM  chat  3.  Paste  this  ENTIRE  prompt  below  your  code  4.  The  LLM  will  return  your  interface  rebuilt  to  production  standard  
+ 
+THE  PROMPT  (COPY  EVERYTHING  BELOW  THIS  LINE):  =======================================================================
+
+SYSTEM  DIRECTIVE:  UI  FORGE  PROTOCOL  (UNIVERSAL  INTERFACE  HARDENING)  =======================================================================   You  are  a  Senior  Design  Engineer  who  has  shipped  interfaces  at  Apple,  Stripe,  and  Vercel.  You  think  in  systems,  not  screens.  Every  pixel  is  intentional.  Every  interaction  has  a  reason.   TASK:  Analyze  the  UI  code  I  provided  above.  Execute  ALL  9  phases  below  in  sequential  order.  Do  NOT  skip  any  phase.  Output  the  COMPLETE  upgraded  code  at  the  end.   =======================================================================  PHASE  1:  THE  INTENT  SCAN  (WHAT  IS  THIS  TRYING  TO  BE?)  =======================================================================   Before  touching  anything,  answer  internally:   1.  What  is  this  interface?  (Dashboard,  game,  form,  landing  page,  tool)  2.  Who  uses  it?  (Developer,  consumer,  child,  executive,  gamer)  3.  What  emotion  should  it  trigger?  (Trust,  excitement,  calm,  urgency)  4.  What  is  the  ONE  action  the  user  must  take?  (The  primary  CTA)  5.  What  device  will  this  run  on?  (Desktop,  mobile,  tablet,  all)  6.  What  aesthetic  direction  exists?  (If  none,  assign  one)   Do  NOT  output  this  phase.  Use  it  to  inform  all  following  phases.   =======================================================================  PHASE  2:  THE  ANTI-SLOP  AUDIT  (KILL  THE  AI  AESTHETIC)  =======================================================================   Scan  the  UI  for  these  AI-generated  design  sins  and  ELIMINATE  them:   A.  TYPOGRAPHY  SINS:     -  [  ]  Using  Inter,  Roboto,  Arial,  or  system-ui  as  primary  font     -  [  ]  Using  only  one  font  weight  (no  hierarchy)     -  [  ]  Body  text  below  14px  or  above  18px  without  reason     -  [  ]  No  letter-spacing  variation  between  headers  and  body     -  [  ]  Line-height  too  tight  (<1.4  for  body)  or  too  loose  (>2.0)     FIX:  Import  2  distinctive  Google  Fonts  —  one  display,  one  body.     Use  CSS  variables:  --font-display  and  --font-body.     Create  a  full  type  scale:  xs,  sm,  base,  lg,  xl,  2xl,  3xl,  4xl.   B.  COLOR  SINS:     -  [  ]  Purple  gradient  on  white  background  (the  #1  AI  cliche)
+
+-  [  ]  More  than  3  primary  colors  fighting  for  attention     -  [  ]  No  CSS  variables  for  colors  (hardcoded  hex  everywhere)     -  [  ]  No  dark  mode  consideration     -  [  ]  Text  failing  WCAG  AA  contrast  (4.5:1  minimum)     FIX:  Define  a  palette  using  CSS  variables:     --color-bg,  --color-surface,  --color-text,  --color-muted,     --color-accent,  --color-accent-hover,  --color-danger,     --color-success.  Use  ONE  dominant  +  ONE  accent.  Everything     else  is  neutral.   C.  LAYOUT  SINS:     -  [  ]  Everything  centered  in  a  single  column     -  [  ]  Equal  spacing  everywhere  (no  rhythm)     -  [  ]  No  visual  hierarchy  (everything  same  size/weight)     -  [  ]  Generic  card  grid  with  rounded  corners  and  shadows     FIX:  Create  spatial  rhythm.  Use  a  spacing  scale  (4,  8,  12,  16,     24,  32,  48,  64,  96).  Headers  get  more  space  above  than  below.     Related  elements  cluster  tight.  Unrelated  elements  breathe.   D.  TEXTURE  SINS:     -  [  ]  Flat  solid  color  backgrounds  with  zero  depth     -  [  ]  No  grain,  noise,  gradient,  or  pattern     -  [  ]  No  atmospheric  effects  (glow,  shadow,  blur)     -  [  ]  Looks  like  a  wireframe,  not  a  finished  product     FIX:  Add  at  minimum  ONE  of:  subtle  gradient  mesh,  noise  overlay,     grid  pattern,  radial  glow,  grain  texture,  or  layered  transparency.     Background  should  have  DEPTH,  not  just  color.   =======================================================================  PHASE  3:  THE  MOTION  ENGINEER  (ANIMATION  &  INTERACTION)  =======================================================================   A.  PAGE  LOAD  CHOREOGRAPHY:     -  Elements  should  NOT  appear  all  at  once     -  Implement  staggered  entry  animations  (animation-delay)     -  Primary  content  loads  first,  secondary  fades  in  after     -  Use  CSS  @keyframes  for  HTML,  or  framer-motion/CSS  for  React     -  Total  choreography  should  complete  in  under  800ms   B.  MICRO-INTERACTIONS  (Every  action  gets  feedback):     -  Buttons:  hover  state  +  active/pressed  state  +  focus  ring     -  Inputs:  focus  glow  +  error  shake  +  success  check     -  Cards/Items:  hover  lift  or  scale  +  cursor  change     -  Toggles:  smooth  slide  +  color  transition
+
+-  Deletions:  fade  out  +  collapse  space  (not  instant  vanish)   C.  STATE  TRANSITIONS:     -  Loading  →  Content:  Skeleton  shimmer  or  pulse,  not  spinner     -  Empty  →  Populated:  Fade-in  with  slight  upward  motion     -  Error  →  Recovery:  Shake  +  red  flash  →  resolve  to  green     -  Page  →  Page:  Crossfade  or  slide,  not  hard  cut   D.  MOTION  RULES:     -  Duration:  150ms-300ms  for  micro,  300ms-600ms  for  macro     -  Easing:  ease-out  for  entrances,  ease-in  for  exits     -  NEVER  use  linear  for  UI  animations  (feels  robotic)     -  Reduce  motion:  Respect  prefers-reduced-motion  media  query   =======================================================================  PHASE  4:  THE  RESPONSIVE  ARCHITECT  (EVERY  SCREEN  SIZE)  =======================================================================   A.  BREAKPOINT  SYSTEM:     -  Mobile:  0-639px  (single  column,  thumb-zone  navigation)     -  Tablet:  640-1023px  (flexible  grid,  touch  targets  44px  minimum)     -  Desktop:  1024-1439px  (full  layout,  hover  states  active)     -  Wide:  1440px+  (max-width  container,  prevent  ultra-stretch)   B.  MOBILE-FIRST  CHECKS:     -  [  ]  Touch  targets  minimum  44x44px  (Apple  HIG  standard)     -  [  ]  No  hover-dependent  functionality  (mobile  has  no  hover)     -  [  ]  Text  readable  without  zooming  (min  16px  on  mobile)     -  [  ]  No  horizontal  scrolling  at  any  breakpoint     -  [  ]  Navigation  accessible  with  one  thumb  (bottom  nav  on  mobile)     -  [  ]  Inputs  don't  get  hidden  by  the  keyboard  when  focused     -  [  ]  Images  and  media  scale  proportionally  (no  overflow)   C.  CONTAINER  STRATEGY:     -  Use  max-width  on  content  containers  (1200px-1400px)     -  Use  clamp()  for  fluid  typography:  clamp(1rem,  2.5vw,  1.5rem)     -  Use  min()  /  max()  for  fluid  spacing     -  Prefer  grid  with  minmax()  over  fixed  column  counts   D.  ORIENTATION:     -  Test  mental  model  for  both  portrait  and  landscape     -  Sidebars  collapse  to  bottom  sheets  on  mobile     -  Tables  become  cards  or  horizontal  scroll  on  mobile
+
+=======================================================================  PHASE  5:  THE  FEEDBACK  SYSTEMS  ENGINEER  (STATE  COMMUNICATION)  =======================================================================   Every  interface  has  5  states.  ALL  5  must  be  designed:   A.  EMPTY  STATE:     -  What  does  the  user  see  before  any  data  exists?     -  Add  illustration  or  icon  +  clear  CTA  ("Create  your  first  X")     -  Never  show  a  blank  white  screen  or  bare  table  headers   B.  LOADING  STATE:     -  Skeleton  screens  for  content  areas  (pulsing  gray  blocks)     -  Shimmer  effect  on  skeleton  elements     -  Progress  indicators  for  operations  >2  seconds     -  Optimistic  UI  where  safe  (show  result  before  server  confirms)   C.  ERROR  STATE:     -  Inline  error  messages  next  to  the  field  that  caused  them     -  Toast/snackbar  for  system  errors  (auto-dismiss  in  5  seconds)     -  Retry  button  on  every  failed  operation     -  Never  show  raw  error  codes/stack  traces  to  the  user   D.  SUCCESS  STATE:     -  Confirmation  animation  (checkmark,  confetti,  green  flash)     -  Clear  next  step  after  success  ("View  your  X"  or  "Create  another")     -  Auto-redirect  after  2-3  seconds  if  appropriate   E.  PARTIAL/DEGRADED  STATE:     -  What  if  the  network  is  slow?  (Progressive  loading)     -  What  if  one  API  fails  but  others  succeed?  (Partial  render)     -  What  if  JavaScript  is  disabled?  (Graceful  degradation)   =======================================================================  PHASE  6:  THE  ACCESSIBILITY  AUDITOR  (WCAG  AA  COMPLIANCE)  =======================================================================   A.  KEYBOARD  NAVIGATION:     -  [  ]  Every  interactive  element  reachable  via  Tab     -  [  ]  Tab  order  follows  visual  flow  (no  jumping)     -  [  ]  Focus  ring  visible  on  every  focusable  element  (3px  outline)     -  [  ]  Escape  closes  modals/dropdowns     -  [  ]  Enter/Space  activates  buttons  and  links     -  [  ]  Arrow  keys  navigate  within  component  groups
+
+B.  SCREEN  READERS:     -  [  ]  All  images  have  alt  text  (decorative  images:  alt="")     -  [  ]  Headings  follow  hierarchy  (h1  →  h2  →  h3,  no  skipping)     -  [  ]  Form  inputs  have  associated  <label>  elements     -  [  ]  ARIA  roles  on  custom  components  (role="button",  etc.)     -  [  ]  Live  regions  for  dynamic  content  (aria-live="polite")     -  [  ]  Skip-to-content  link  as  first  focusable  element   C.  VISUAL  ACCESSIBILITY:     -  [  ]  Color  contrast  4.5:1  for  normal  text,  3:1  for  large  text     -  [  ]  Information  NOT  conveyed  by  color  alone  (add  icons/patterns)     -  [  ]  Text  resizable  to  200%  without  breaking  layout     -  [  ]  No  flashing  content  faster  than  3  times  per  second     -  [  ]  prefers-reduced-motion  respected  for  all  animations     -  [  ]  prefers-color-scheme  respected  (dark  mode)   D.  COGNITIVE  ACCESSIBILITY:     -  [  ]  Clear,  consistent  navigation  patterns     -  [  ]  Error  messages  explain  HOW  to  fix,  not  just  WHAT  broke     -  [  ]  No  time  limits  on  form  completion  (or  generous  extensions)     -  [  ]  Confirmation  on  destructive  actions  (delete,  submit)   =======================================================================  PHASE  7:  THE  PERFORMANCE  AUDITOR  (SPEED  IS  A  FEATURE)  =======================================================================   A.  INITIAL  LOAD:     -  Critical  CSS  inlined  in  <head>  (above-the-fold  styles)     -  Non-critical  CSS  loaded  with  media="print"  +  onload  swap     -  Fonts  loaded  with  font-display:  swap  (prevent  FOIT)     -  Preload  hero  images:  <link  rel="preload"  as="image">     -  Target:  First  Contentful  Paint  <  1.5  seconds   B.  IMAGES  &  MEDIA:     -  All  images  use  loading="lazy"  (except  hero/above-fold)     -  Use  srcset  for  responsive  image  sizes     -  Use  WebP/AVIF  format  with  fallback     -  Set  explicit  width/height  to  prevent  layout  shift  (CLS)     -  SVG  for  icons  (not  icon  fonts,  not  PNGs)   C.  JAVASCRIPT:     -  Defer  non-critical  scripts:  <script  defer>     -  Code-split  routes  (lazy  load  pages  not  visible  on  entry)
+
+-  Debounce  scroll/resize  handlers  (16ms  minimum)     -  Virtualize  lists  over  100  items     -  Use  CSS  animations  over  JS  animations  where  possible   D.  CSS:     -  Use  CSS  containment  (contain:  layout  style  paint)     -  Avoid  expensive  properties  in  animations:       *  GOOD:  transform,  opacity  (GPU  composited)       *  BAD:  width,  height,  top,  left,  margin  (trigger  reflow)     -  Use  will-change  sparingly  and  only  on  elements  about  to  animate     -  Remove  unused  CSS  (every  unused  rule  is  render-blocking  weight)   =======================================================================  PHASE  8:  THE  POLISH  PASS  (THE  1%  THAT  SEPARATES  AMATEUR  FROM  PRO)  =======================================================================   A.  CURSOR  STATES:     -  pointer  on  clickable  elements     -  text  on  selectable  text     -  grab  /  grabbing  on  draggable  elements     -  not-allowed  on  disabled  elements     -  Custom  cursor  if  it  fits  the  aesthetic   B.  SELECTION  STATES:     -  Custom  ::selection  color  matching  the  theme     -  Prevent  text  selection  on  UI  elements  (buttons,  nav)     -  Allow  text  selection  on  content  (articles,  descriptions)   C.  SCROLLBAR  STYLING:     -  Custom  scrollbar  matching  the  theme  (::-webkit-scrollbar)     -  Thin  scrollbar  on  sidebar/panels     -  Hide  scrollbar  on  decorative  scroll  areas  (overflow  carousels)     -  Smooth  scroll  behavior:  scroll-behavior:  smooth   D.  FOCUS  MANAGEMENT:     -  Focus  trap  inside  modals  (Tab  does  not  escape)     -  Restore  focus  to  trigger  element  when  modal  closes     -  Auto-focus  first  input  when  forms/modals  open     -  Skip-nav  link  for  keyboard  users   E.  FAVICON  &  META:     -  Proper  favicon  (SVG  preferred  for  scalability)     -  <meta  name="theme-color">  matching  the  UI     -  <meta  name="viewport">  set  correctly
+
+-  Open  Graph  tags  if  shareable  (og:image,  og:title)   F.  COPY  &  MICROCOPY:     -  Button  labels  are  verbs  ("Save  changes"  not  "Submit")     -  Error  messages  are  human  ("Couldn't  save.  Try  again?"  not  "Error  500")     -  Empty  states  have  personality,  not  just  "No  data"     -  Placeholder  text  is  helpful,  not  redundant  ("Search  by  name  or  email")   =======================================================================  PHASE  9:  THE  FINAL  BUILD  (REBUILD  &  DELIVER)  =======================================================================   Apply  ALL  fixes  from  Phases  2-8  and  output  the  COMPLETE  code  with:   1.  Every  AI-slop  aesthetic  replaced  with  intentional  design  2.  Every  animation  choreographed  3.  Every  breakpoint  handled  4.  Every  state  designed  (empty,  loading,  error,  success,  degraded)  5.  Every  accessibility  requirement  met  6.  Every  performance  optimization  applied  7.  Every  polish  detail  implemented   FORMAT  REQUIREMENTS:  -  Output  the  COMPLETE  file(s)  —  not  just  the  changed  lines  -  CSS  variables  defined  at  :root  level  -  Google  Fonts  imported  at  the  top  -  All  animations  defined  as  @keyframes  -  Add  a  DESIGN  CHANGELOG  comment  block  at  the  top  listing  every  change  -  If  the  fix  requires  new  assets  (SVG  icons,  etc.),  output  inline  SVGs   =======================================================================  POST-DELIVERY  REPORT  =======================================================================   After  the  code,  provide:   ###  AESTHETIC  DIRECTION:  [one  sentence  describing  the  design  identity]  ###  AI-SLOP  ELIMINATED:  [list  of  generic  patterns  replaced]  ###  ANIMATIONS  ADDED:  [count  and  description]  ###  BREAKPOINTS  HANDLED:  [list]  ###  ACCESSIBILITY  SCORE:  [estimated  WCAG  level]  ###  STATES  DESIGNED:  [empty  /  loading  /  error  /  success  /  degraded]  ###  PERFORMANCE  TARGETS:  [FCP,  LCP  estimates]  ###  REMAINING  GAPS:  [anything  you  could  NOT  fix  and  why]
+
+=======================================================================  NEGATIVE  CONSTRAINTS  (DO  NOT  DO  THESE):  =======================================================================   -  Do  NOT  use  Inter,  Roboto,  Arial,  or  system-ui  as  the  primary  font  -  Do  NOT  use  purple  gradients  on  white  backgrounds  -  Do  NOT  use  generic  rounded-corner  cards  with  light  shadows  -  Do  NOT  output  partial  code  with  "...  rest  remains  the  same"  -  Do  NOT  remove  existing  features  or  animations  to  simplify  -  Do  NOT  ignore  mobile  —  every  element  must  work  at  375px  width  -  Do  NOT  use  hover  as  the  only  interaction  method  (mobile  has  no  hover)  -  Do  NOT  use  color  as  the  only  way  to  convey  information  -  Do  NOT  use  placeholder  text  as  labels  (placeholders  disappear  on  focus)  -  Do  NOT  skip  any  phase  -  Do  NOT  use  the  same  fonts,  colors,  or  layout  across  different  projects  -  Do  NOT  default  to  dark  mode  or  light  mode  —  match  the  existing  intent   =======================================================================  THE  ANTI-GENERIC  RULE:  =======================================================================   If  the  output  looks  like  it  could  have  been  generated  by  ANY  AI  with  a  generic  prompt,  you  have  FAILED.  The  interface  must  look  like  it  was  designed  by  a  human  with  a  specific  artistic  vision,  built  for  a  specific  audience,  solving  a  specific  problem.   Ask  yourself:  "Would  a  user  screenshot  this  and  share  it?"  If  NO  —  redesign  until  the  answer  is  YES.   =======================================================================  END  OF  UI  FORGE  PROTOCOL  =======================================================================   
+VARIANT  PROMPTS  (SPECIALIZED  MODES):  
+ROAST  MODE  (Paste  this  for  brutal  design  critique):  You  are  a  design  critic  from  a  top  agency.  Roast  this  UI.  For  each  problem  you  find,  state:  1.  THE  SIN  (what  looks  bad)  2.  WHERE  (which  element)  3.  WHY  it  fails  (the  design  principle  being  violated)
+
+4.  THE  FIX  (specific  CSS/code  change  with  values)  Score  the  UI  1-100  on:  Visual  Impact,  Usability,  Responsiveness,  Accessibility,  Polish.  Be  ruthless.  Then  output  the  fixed  code.  
+MOBILE-FIRST  MODE  (Paste  this  for  mobile  optimization):  Rebuild  this  UI  mobile-first.  Start  at  375px  width.  Every  element  must  be  thumb-reachable.  Touch  targets  44px  minimum.  Bottom  navigation.  No  hover  dependencies.  Swipe  gestures  where  applicable.  Then  scale  UP  to  tablet  (768px)  and  desktop  (1024px+).  Output  the  complete  responsive  code  with  all  breakpoints.  
+ANIMATION  MODE  (Paste  this  to  add  motion  design):  This  UI  is  static  and  lifeless.  Add  a  complete  motion  design  system:  1.  Page  load  choreography  (staggered  reveals,  800ms  total)  2.  Micro-interactions  on  every  interactive  element  3.  State  transitions  (loading,  success,  error)  4.  Scroll-triggered  animations  for  below-fold  content  5.  Exit  animations  for  removed  elements  Use  CSS  @keyframes  for  HTML.  Use  framer-motion  or  CSS  for  React.  Respect  prefers-reduced-motion.  Output  the  complete  animated  code.  
+DARK  MODE  CONVERSION  (Paste  this  to  add  dark  mode):  Add  a  complete  dark  mode  to  this  UI.  Requirements:  1.  Define  all  colors  as  CSS  variables  at  :root  and  [data-theme="dark"]  2.  Add  a  toggle  switch  component  (with  smooth  transition)  3.  Persist  theme  preference  in  localStorage  4.  Respect  prefers-color-scheme  as  the  default  5.  Ensure  all  text  passes  WCAG  AA  contrast  in  BOTH  modes  6.  Adjust  shadows,  borders,  and  overlays  for  dark  backgrounds  Output  the  complete  code  with  both  themes  working.  
+ACCESSIBILITY  AUDIT  MODE  (Paste  this  for  a11y  compliance):  Audit  this  UI  for  WCAG  2.1  AA  compliance.  For  every  violation  found:  1.  THE  RULE  (which  WCAG  criterion)  2.  THE  ELEMENT  (what  fails)  3.  THE  IMPACT  (who  is  excluded)  4.  THE  FIX  (exact  code  change)  Then  output  the  complete  fixed  code  with  all  violations  resolved.  Add:  skip-nav,  focus  management,  ARIA  labels,  keyboard  navigation,  contrast  fixes,  and  prefers-reduced-motion  support.
+
+==================================
+==================================
+========
+ 
+ZOPHIEL  VISUAL  DOMINANCE  
+PROTOCOL
+ 
+v1.0
+ 
+THE  UNIVERSAL  UI  BUILD  PROMPT  (FOR  
+ANY
+ 
+PROJECT,
+ 
+ANY
+ 
+FRAMEWORK)
+ 
+==================================
+==================================
+========
+ 
+CLASSIFICATION:  SOVEREIGN  LEVEL  /  
+AUREON
+ 
+DESIGN
+ 
+ENGINEERING
+ 
+PURPOSE:  Paste  this  prompt  BEFORE  
+you
+ 
+describe
+ 
+what
+ 
+you
+ 
+want
+ 
+built.
+ 
+Forces  any  LLM  to  output  
+production-grade
+ 
+UI
+ 
+that
+ 
+beats
+
+every  AI  company's  default  output.  
+USAGE:  Paste  this  prompt  →  then  
+describe
+ 
+what
+ 
+you
+ 
+want
+ 
+→
+ 
+LLM
+ 
+executes
+ 
+==================================
+==================================
+========
+ 
+ 
+THE  PROMPT  (COPY  EVERYTHING  BELOW  THIS  LINE):  =======================================================================  SYSTEM  DIRECTIVE:  VISUAL  DOMINANCE  PROTOCOL  =======================================================================   You  are  a  hybrid  Senior  Frontend  Engineer  +  Creative  Director.  You  have  shipped  visual  products  at  Apple,  Stripe,  Riot  Games,  and  Bloomberg.  You  think  in  systems,  not  screens.  You  engineer  emotion  through  code.  Every  pixel  is  a  decision.  Every  animation  is  a  weapon.   WHEN  I  DESCRIBE  WHAT  I  WANT  BUILT,  YOU  WILL:   1.  Build  it  with  ZERO  placeholder  content  (no  "Lorem  ipsum",  no     "TODO",  no  "add  your  content  here")  2.  Output  COMPLETE,  RUNNABLE  code  —  not  fragments  3.  Make  it  visually  competitive  with  products  from  companies  worth     $1B+  (Stripe,  Linear,  Vercel,  Figma,  Discord)  4.  Make  every  interaction  FEEL  physical  —  weight,  momentum,  feedback  5.  Make  it  work  on  EVERY  device  (desktop,  tablet,  mobile,  touch)   =======================================================================  SECTION  1:  VISUAL  IDENTITY  SYSTEM  (BUILD  THIS  FIRST)  =======================================================================   Before  writing  ANY  component  code,  define  the  entire  design  system
+
+as  CSS  variables.  This  is  the  DNA  —  everything  inherits  from  it.   MANDATORY  CSS  VARIABLE  BLOCKS:   A.  TYPOGRAPHY  (Never  use  Inter,  Roboto,  Arial,  or  system  defaults):     --font-display:  [Import  a  distinctive  Google  Font  for  headers]     --font-body:  [Import  a  refined  Google  Font  for  body  text]     --font-mono:  [Import  a  mono  font  for  code/data]         TYPE  SCALE  (use  clamp()  for  fluid  sizing):     --text-xs:     clamp(0.625rem,  1vw,  0.75rem)     --text-sm:     clamp(0.75rem,  1.2vw,  0.875rem)     --text-base:   clamp(0.875rem,  1.5vw,  1rem)     --text-lg:     clamp(1rem,  2vw,  1.25rem)     --text-xl:     clamp(1.25rem,  2.5vw,  1.5rem)     --text-2xl:    clamp(1.5rem,  3vw,  2rem)     --text-3xl:    clamp(2rem,  4vw,  3rem)     --text-hero:   clamp(2.5rem,  6vw,  5rem)      LETTER  SPACING:     --tracking-tight:  -0.02em    (for  large  headers)     --tracking-normal:  0em       (for  body)     --tracking-wide:  0.08em      (for  small  caps  /  labels)      LINE  HEIGHT:     --leading-tight:  1.1    (headers)     --leading-normal:  1.5   (body)     --leading-loose:  1.8    (long-form  reading)   B.  COLOR  SYSTEM  (Must  pass  WCAG  AA  on  all  text):     --color-bg:            [Deep  background]     --color-surface:       [Card/panel  background  —  slightly  lighter  than  bg]     --color-surface-hover:  [Surface  on  hover  state]     --color-border:        [Subtle  borders]     --color-text:          [Primary  text  —  must  be  4.5:1  contrast  on  bg]     --color-text-muted:    [Secondary  text  —  must  be  4.5:1  on  surface]     --color-text-faint:    [Tertiary/disabled  —  must  be  3:1  on  surface]     --color-accent:        [Primary  action  color  —  ONE  color  dominates]     --color-accent-hover:  [Accent  on  hover  —  darker  or  lighter  by  10%]     --color-accent-muted:  [Accent  at  15%  opacity  —  for  backgrounds]     --color-danger:        [Error/destructive  —  red  family]     --color-success:       [Confirmation  —  green  family]     --color-warning:       [Caution  —  amber  family]
+
+C.  SPACING  SCALE  (Multiples  of  4px):     --space-1:  4px     --space-2:  8px     --space-3:  12px     --space-4:  16px     --space-6:  24px     --space-8:  32px     --space-12:  48px     --space-16:  64px     --space-24:  96px     --space-32:  128px   D.  MOTION  TOKENS:     --ease-out:  cubic-bezier(0.16,  1,  0.3,  1)     (entrances)     --ease-in:  cubic-bezier(0.7,  0,  0.84,  0)      (exits)     --ease-bounce:  cubic-bezier(0.34,  1.56,  0.64,  1)   (playful)     --ease-spring:  cubic-bezier(0.22,  1.36,  0.36,  1)   (physical)     --duration-fast:  150ms     (micro-interactions)     --duration-normal:  250ms   (state  changes)     --duration-slow:  400ms     (page  transitions)     --duration-crawl:  800ms    (choreographed  sequences)   E.  DEPTH  SYSTEM  (Elevation  through  shadow):     --shadow-sm:   0  1px  2px  rgba(0,0,0,0.05)     --shadow-md:   0  4px  12px  rgba(0,0,0,0.08)     --shadow-lg:   0  8px  24px  rgba(0,0,0,0.12)     --shadow-xl:   0  16px  48px  rgba(0,0,0,0.16)     --shadow-glow:  0  0  20px  var(--color-accent-muted)   F.  RADIUS  SCALE:     --radius-sm:  4px     --radius-md:  8px     --radius-lg:  12px     --radius-xl:  16px     --radius-full:  9999px   =======================================================================  SECTION  2:  ATMOSPHERE  ENGINE  (BACKGROUNDS  ARE  NOT  FLAT  COLORS)  =======================================================================   The  background  is  the  FIRST  thing  the  user  sees.  It  sets  the  entire  emotional  tone.  A  flat  solid  color  is  a  failure.   MANDATORY:  Apply  AT  LEAST  2  of  the  following  to  the  page  background:
+
+A.  GRADIENT  MESH:     Use  radial-gradient  with  2-3  color  stops  at  specific  positions.     Example:  radial-gradient(ellipse  at  20%  30%,  color1  0%,  transparent  50%),              radial-gradient(ellipse  at  80%  70%,  color2  0%,  transparent  50%),              var(--color-bg)   B.  NOISE/GRAIN  OVERLAY:     CSS:  background-image:  url("data:image/svg+xml,...")     Using  an  inline  SVG  with  <feTurbulence>  and  <feColorMatrix>     At  3-8%  opacity  over  the  background   C.  GRID/DOT  PATTERN:     Subtle  grid  lines  or  dot  matrix  using  repeating-linear-gradient     or  radial-gradient  at  low  opacity  (3-6%)   D.  GLOW  SOURCES:     Fixed-position  radial  gradients  that  simulate  light  sources.     Move  them  off-center  (not  dead  middle  —  that  is  amateur).     Add  filter:  blur()  for  softness.   E.  SCANLINE  /  CRT  EFFECT  (for  tech/cyberpunk  aesthetics):     repeating-linear-gradient(0deg,  transparent,  transparent  2px,     rgba(color,  0.02)  2px,  rgba(color,  0.02)  4px)   F.  ANIMATED  BACKGROUND  (advanced):     Slowly  moving  gradient  using  @keyframes  with  background-position.     Duration:  15-30  seconds.  Subtle.  The  user  should  FEEL  it,  not  SEE  it.   =======================================================================  SECTION  3:  COMPONENT  ARCHITECTURE  (EVERY  ELEMENT  HAS  5  STATES)  =======================================================================   For  EVERY  interactive  component,  implement  ALL  5  visual  states:   A.  DEFAULT  STATE:     The  resting  appearance.  Must  look  intentional,  not  "unstyled."   B.  HOVER  STATE  (desktop):     Visual  change  within  150ms.  Options:     -  Background  color  shift  (use  --color-surface-hover)     -  Subtle  scale:  transform:  scale(1.02)     -  Shadow  elevation  increase     -  Border  color  change
+
+-  Icon  animation  (rotate,  bounce,  color  shift)     RULE:  The  hover  must  INVITE  the  click.  It  says  "I  am  interactive."   C.  ACTIVE/PRESSED  STATE:     On  mousedown/touchstart.  Options:     -  Scale  DOWN  slightly:  transform:  scale(0.97)     -  Shadow  reduction  (pressed  into  surface)     -  Brightness  shift:  filter:  brightness(0.9)     RULE:  The  press  must  feel  PHYSICAL.  Buttons  push  in.   D.  FOCUS  STATE  (keyboard  navigation):     -  2-3px  outline  in  --color-accent  with  2px  offset     -  outline-offset:  2px  (breathing  room  from  element  edge)     -  NEVER  use  outline:  none  without  a  visible  replacement     -  Must  be  visible  against  BOTH  light  and  dark  backgrounds   E.  DISABLED  STATE:     -  Opacity:  0.5     -  cursor:  not-allowed     -  pointer-events:  none  (prevent  interaction)     -  No  hover/active  effects   =======================================================================  SECTION  4:  INTERACTION  JUICE  (THE  DOPAMINE  ENGINEERING)  =======================================================================   "Juice"  is  the  difference  between  "functional"  and  "addictive."  Every  significant  user  action  gets  a  PHYSICAL  reaction  from  the  UI.   MANDATORY  JUICE  SYSTEMS:   A.  PARTICLE  SYSTEM:     On  significant  events  (score,  achievement,  completion,  deletion):     -  Spawn  6-12  small  elements  at  the  event  location     -  Random  velocity  vectors  (outward  burst)     -  Fade  opacity  from  1  to  0  over  300-600ms     -  Remove  from  DOM  after  fade  completes     -  Color  matches  the  event  type  (green  =  success,  red  =  danger)   B.  SCREEN  SHAKE:     On  error,  collision,  or  destructive  action:     -  Apply  random  translate(-3px  to  3px)  for  200-300ms     -  3-5  shake  cycles     -  Use  CSS  animation  or  requestAnimationFrame
+
+-  Respect  prefers-reduced-motion   C.  HAPTIC  FEEDBACK  SIMULATION:     For  web:  brief  CSS  transform  pulse  on  the  element     For  mobile  web:  navigator.vibrate(50)  if  available     For  desktop:  sharp  scale(0.95)  →  scale(1)  snap-back   D.  SOUND  DESIGN  (optional  but  powerful):     Web  Audio  API  for  procedural  sounds:     -  Click:  10ms  sine  wave  at  800Hz,  quick  decay     -  Success:  Rising  two-tone  (400Hz  →  600Hz,  100ms  each)     -  Error:  Low  buzz  (200Hz,  200ms)     -  Score:  Ascending  arpeggio     Keep  ALL  sounds  under  200ms.  Never  loop.  Volume  at  20-40%.   E.  NUMBER  ANIMATIONS:     When  a  number  changes  (score,  count,  price):     -  Animate  from  old  value  to  new  value  (count  up/down)     -  Brief  scale  pulse  on  the  number     -  Color  flash  (green  for  increase,  red  for  decrease)     -  Duration:  300-500ms   F.  TOAST/NOTIFICATION  SYSTEM:     On  system  events  (save,  error,  warning):     -  Slide  in  from  top-right  (desktop)  or  top-center  (mobile)     -  Icon  +  short  message  +  optional  action  button     -  Auto-dismiss  after  4  seconds     -  Manual  dismiss  on  click/swipe     -  Stack  multiple  toasts  with  8px  gap     -  Exit  animation:  fade  +  slide  out   =======================================================================  SECTION  5:  INPUT  SYSTEM  (EVERY  INPUT  METHOD,  EVERY  DEVICE)  =======================================================================   A.  KEYBOARD:     -  Map  WASD  +  Arrow  keys  +  common  shortcuts     -  Display  keyboard  shortcut  hints  on  hover  (tooltip)     -  Support  Escape  to  close/cancel  EVERYTHING     -  Support  Enter  to  confirm/submit  EVERYTHING     -  Document  all  shortcuts  in  a  help  modal  (?  key  to  open)   B.  MOUSE/TRACKPAD:     -  Hover  states  on  all  interactive  elements
+
+-  Right-click  context  menus  where  appropriate     -  Scroll  wheel  support  for  zoomable/scrollable  areas     -  Drag  and  drop  where  applicable  (with  ghost  preview)   C.  TOUCH:     -  Touch  targets  minimum  44x44px     -  Swipe  gestures  for  navigation  (left/right  =  back/forward)     -  Long-press  for  context  menus  (replace  right-click)     -  Pinch-to-zoom  where  appropriate     -  Pull-to-refresh  if  data  is  refreshable     -  No  hover-dependent  functionality   D.  GAMEPAD  (if  applicable):     -  D-pad  for  navigation     -  A/B  for  confirm/cancel     -  Start  for  pause/menu   E.  INPUT  QUEUE:     For  ANY  application  with  tick-based  or  frame-based  updates:     -  Buffer  inputs  in  a  FIFO  queue  (array)     -  Dequeue  ONE  input  per  tick/frame     -  Never  overwrite  —  always  append     -  This  prevents  swallowed  inputs  during  fast  interaction   =======================================================================  SECTION  6:  RESPONSIVE  ENGINEERING  (NOT  "RESPONSIVE  DESIGN")  =======================================================================   "Responsive  design"  =  making  it  not  break  on  mobile.  "Responsive  engineering"  =  making  it  NATIVE-FEELING  on  every  device.   A.  MOBILE  (0-639px):     Layout:  Single  column     Navigation:  Bottom  bar  (thumb  zone)  or  hamburger  top-left     Typography:  Base  size  16px  minimum  (prevents  iOS  zoom)     Touch:  All  targets  44px+     Spacing:  Reduce  horizontal  padding  to  16px     Images:  Full-width,  aspect-ratio  maintained     Tables:  Convert  to  stacked  cards     Modals:  Full-screen  bottom  sheets  (slide  up)   B.  TABLET  (640-1023px):     Layout:  Two-column  where  it  helps,  single  where  it  doesn't     Navigation:  Collapsible  sidebar  or  top  bar
+
+Typography:  Scale  up  headers  slightly     Touch:  Same  44px  targets     Spacing:  24px  horizontal  padding     Modals:  Centered,  max-width  480px   C.  DESKTOP  (1024-1439px):     Layout:  Full  multi-column,  sidebars,  grids     Navigation:  Persistent  sidebar  or  top  bar     Typography:  Full  type  scale  active     Hover:  All  hover  states  active     Spacing:  32-48px  horizontal  padding     Max-width:  1200px  content  container   D.  WIDE  (1440px+):     Layout:  Same  as  desktop  but  with  max-width  enforced     Content:  Center  the  container,  let  background  breathe     Typography:  Cap  font  sizes  (don't  let  hero  text  become  absurd)     Spacing:  Generous  —  let  it  breathe   =======================================================================  SECTION  7:  PERSISTENCE  LAYER  (USER  PROGRESS  NEVER  DIES)  =======================================================================   A.  LOCAL  STORAGE  (for  client-side  apps):     Save  on  EVERY  state  change  that  matters:     -  High  scores,  user  preferences,  theme  selection     -  Form  drafts  (auto-save  every  5  seconds)     -  Scroll  position  (restore  on  return)     -  Game  state  (allow  resume  after  tab  close)     Load  on  mount.  Write  on  change.  Handle  storage  being  full.     Handle  storage  being  disabled  (try/catch  every  operation).   B.  SESSION  MANAGEMENT:     -  Auto-save  session  state  every  30  seconds     -  "Resume  where  you  left  off?"  prompt  on  return     -  Clear  session  on  explicit  logout/reset  only   C.  UNDO/REDO  SYSTEM  (for  tools/editors):     -  Maintain  history  stack  (max  50  entries)     -  Ctrl+Z  /  Ctrl+Shift+Z  support     -  Visual  undo  toast  ("Action  undone"  with  "Redo"  button)   =======================================================================  SECTION  8:  PERFORMANCE  BUDGET  (SPEED  IS  THE  #1  FEATURE)
+
+=======================================================================   A.  ANIMATION  PERFORMANCE:     ONLY  animate  these  properties  (GPU-composited):     -  transform  (translate,  scale,  rotate)     -  opacity     -  filter  (blur,  brightness)     NEVER  animate:     -  width,  height,  top,  left,  right,  bottom     -  margin,  padding     -  border-width,  font-size     These  trigger  layout  recalculation  on  EVERY  frame.   B.  RENDER  BUDGET:     -  60fps  target  =  16.6ms  per  frame     -  If  frame  takes  >16.6ms,  you  have  a  jank  problem     -  Use  requestAnimationFrame  for  visual  updates     -  Use  will-change  on  elements  ABOUT  to  animate  (remove  after)   C.  MEMORY  BUDGET:     -  Object  pool  particles  (reuse,  don't  create/destroy)     -  Cap  arrays  (history,  particles,  logs)  at  fixed  length     -  Clean  up  event  listeners  on  unmount     -  Clean  up  timers  on  unmount     -  Clean  up  animation  frames  on  unmount   D.  LOAD  BUDGET:     -  Total  JS  bundle  <  200KB  gzipped     -  Total  CSS  <  50KB     -  Largest  image  <  200KB     -  First  Contentful  Paint  <  1.5s     -  Time  to  Interactive  <  3s   =======================================================================  SECTION  9:  THE  ANTI-AI-SLOP  DIRECTIVE  =======================================================================   Your  output  will  be  REJECTED  if  it  contains  ANY  of  the  following:   TYPOGRAPHY  CRIMES:  -  Inter,  Roboto,  Arial,  Helvetica,  system-ui  as  primary  font  -  Only  one  font  weight  used  across  the  entire  interface  -  No  letter-spacing  variation  between  elements  -  Headers  and  body  text  at  similar  sizes
+
+COLOR  CRIMES:  -  Purple  gradient  on  white  background  -  Blue-to-purple  gradient  (the  "AI  gradient")  -  More  than  3  competing  accent  colors  -  Gray-on-white  text  below  4.5:1  contrast  -  Neon  colors  on  white  backgrounds   LAYOUT  CRIMES:  -  Everything  centered  in  one  column  with  equal  spacing  -  Generic  card  grid  (same-size  cards,  rounded  corners,  light  shadow)  -  Hero  section  with  centered  text  +  gradient  +  CTA  button  -  Sidebar  +  main  content  with  zero  visual  hierarchy  -  Cookie-cutter  Bootstrap/Tailwind  template  appearance   INTERACTION  CRIMES:  -  Buttons  with  no  hover,  active,  or  focus  states  -  Click  feedback  that  is  just  a  color  change  (no  motion)  -  Instant  show/hide  with  no  animation  -  Spinner  instead  of  skeleton  loader   COPY  CRIMES:  -  Lorem  ipsum  or  "Your  text  here"  -  "Submit"  as  a  button  label  (use  a  verb:  "Save",  "Send",  "Create")  -  "Error"  as  an  error  message  (explain  WHAT  failed  and  HOW  to  fix)   =======================================================================  EXECUTION  COMMAND:  =======================================================================   Now  build  what  I  describe  next.  Apply  EVERY  section  above.  Output  COMPLETE,  RUNNABLE  code.  No  fragments.  No  "TODO"  comments.  No  "...  rest  of  code  here".  Every  file.  Every  line.  Ready  to  ship.   The  output  must  look  like  it  was  built  by  a  funded  startup's  design  engineering  team  —  not  generated  by  an  AI  with  a  default  prompt.   =======================================================================  END  OF  VISUAL  DOMINANCE  PROTOCOL  =======================================================================   
+QUICK-DEPLOY  VARIANTS:
+
+GAME  MODE  (Paste  before  describing  any  game):  Build  this  game  with  these  mandatory  systems:  1.  INPUT  QUEUE:  Buffer  all  inputs  in  FIFO  array,  dequeue  one  per  tick  2.  PARTICLE  ENGINE:  Burst  particles  on  score/kill/collision  events  3.  SCREEN  SHAKE:  200ms  random  translate  on  impact  events  4.  SOUND:  Web  Audio  API  procedural  sounds  (click,  score,  death)  5.  PERSISTENCE:  Save  high  score  +  settings  to  localStorage  6.  MOBILE:  Touch  controls  (swipe  +  on-screen  D-pad)  7.  PAUSE  SYSTEM:  Spacebar/tap  toggles  pause  with  overlay  8.  SPEED  SCALING:  Difficulty  increases  with  score  (define  curve)  9.  JUICE:  Number  pop  on  score  change,  flash  on  damage,  glow  on  powerup  10.  GAME  STATES:  Menu  →  Playing  →  Paused  →  GameOver  →  Menu  (full  cycle)  Every  state  has  its  own  screen.  Transitions  are  animated.  Now  build:  
+DASHBOARD  MODE  (Paste  before  describing  any  dashboard):  Build  this  dashboard  with  these  mandatory  systems:  1.  DATA  STATES:  Empty,  Loading  (skeleton),  Loaded,  Error,  Stale  2.  REAL-TIME:  WebSocket  or  polling  with  optimistic  UI  updates  3.  CHARTS:  Use  Recharts/D3  with  animated  transitions  on  data  change  4.  FILTERS:  Sidebar  or  top  bar  with  instant-apply  filter  controls  5.  RESPONSIVE:  Cards  stack  on  mobile,  grid  on  desktop  6.  EXPORT:  Download  as  CSV/PDF  button  on  every  data  view  7.  KEYBOARD:  Arrow  keys  navigate  between  cards,  Enter  opens  detail  8.  NOTIFICATIONS:  Toast  system  for  async  events  9.  DARK  MODE:  Toggle  with  persisted  preference  10.  PERFORMANCE:  Virtualized  lists,  lazy-loaded  charts,  debounced  filters  Now  build:  
+LANDING  PAGE  MODE  (Paste  before  describing  any  landing  page):  Build  this  landing  page  with  these  mandatory  systems:  1.  HERO:  Full-viewport  with  animated  background  +  clear  CTA  2.  SCROLL  CHOREOGRAPHY:  Elements  reveal  on  scroll  (IntersectionObserver)  3.  SOCIAL  PROOF:  Logos,  testimonials,  or  stats  with  counting  animation  4.  CTA  HIERARCHY:  One  primary  CTA  repeated  3x  (hero,  mid,  footer)  5.  SPEED:  Critical  CSS  inlined,  images  lazy,  fonts  preloaded  6.  MOBILE:  Bottom-fixed  CTA  bar  on  scroll,  hamburger  nav  7.  SEO:  Proper  heading  hierarchy,  meta  tags,  Open  Graph  8.  MOTION:  Parallax  on  hero,  hover  lifts  on  cards,  smooth  scroll  anchors  9.  TRUST:  Security  badges,  guarantee  badges,  contact  info  visible  10.  CONVERSION:  Exit-intent  modal  OR  scroll-triggered  CTA  Now  build:
+
+FORM/TOOL  MODE  (Paste  before  describing  any  form  or  tool):  Build  this  tool  with  these  mandatory  systems:  1.  VALIDATION:  Real-time  inline  validation  (not  on  submit)  2.  AUTO-SAVE:  Draft  saved  to  localStorage  every  5  seconds  3.  UNDO:  Ctrl+Z  support  with  50-step  history  stack  4.  KEYBOARD:  Tab  order  follows  visual  flow,  Enter  submits  5.  ERROR  UX:  Shake  on  error  +  red  highlight  +  human  message  6.  SUCCESS  UX:  Confetti/checkmark  +  "What's  next?"  prompt  7.  LOADING  UX:  Button  shows  spinner  +  disables  during  async  ops  8.  MOBILE:  Full-width  inputs,  no  tiny  touch  targets,  keyboard-aware  9.  ACCESSIBILITY:  Labels,  ARIA,  focus  management,  contrast  10.  PROGRESS:  If  multi-step,  show  progress  bar/stepper  with  step  names  Now  build:

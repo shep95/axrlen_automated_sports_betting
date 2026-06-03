@@ -1,0 +1,101 @@
+# Extracted from: LLM Debugging.pdf
+
+PROJECT  "AUREON"  -  INTELLIGENCE  REPORT  SUBJECT:  ELITE  DEBUGGING  PROTOCOLS  (THE  BILLION-DOLLAR  WORKFLOW)  CLASSIFICATION:  TOP  SECRET  //  EYES  ONLY  DATE:  2026-02-07  AUTHOR:  ZOPHIEL  (AI  SPECIALIST)   ###  I.  THE  MYTH  OF  THE  "SMARTER"  LLM  *    **The  Lie:**  People  think  Google/OpenAI  have  a  "Magic  Model"  that  is  smarter  than  yours.  *    **The  Truth:**  They  use  the  same  models  (GPT-4,  Claude  3.5  Sonnet).  The  difference  is  
+**CONTEXT**
+ 
+and
+ 
+**REFLECTION**.
+ *    **The  Secret:**  A  Billion-Dollar  Debugger  does  not  just  "read  the  error."  It  reads  the  **entire  
+execution
+ 
+state**.
+  ###  II.  THE  "TRINITY"  DEBUGGING  ARCHITECTURE  Top-tier  companies  (FAANG)  use  a  3-Step  Agentic  Workflow  to  fix  bugs.  They  do  not  just  "ask  
+the
+ 
+AI."
+  ####  1.  THE  SCOUT  (CONTEXT  GATHERING)  *    **The  Problem:**  You  paste  an  error:  `NullReferenceException`.  The  AI  guesses.  *    **The  Elite  Way:**  The  Scout  Agent  automatically  grabs:      *    The  **Stack  Trace**  (Where  it  died).      *    The  **Related  Code  Files**  (The  3  files  touching  that  function).      *    The  **Recent  Git  Diffs**  (What  changed  in  the  last  hour?).      *    **The  Prompt  Injection:**  "Here  is  the  error,  here  is  the  code,  and  here  is  what  the  user  
+*just*
+ 
+changed.
+ 
+Analyze."
+  ####  2.  THE  DIAGNOSTICIAN  (ROOT  CAUSE  ANALYSIS)  *    **The  Logic:**  Do  not  fix  the  symptom.  Find  the  disease.  *    **The  "Rubber  Duck"  Protocol:**  The  AI  is  forced  to  explain  the  code  to  itself  *before*  offering  
+a
+ 
+fix.
+     *    *Internal  Monologue:*  "I  see  a  Null  error.  Variable  X  is  passed  from  Function  A.  Function  A  
+gets
+ 
+it
+ 
+from
+ 
+the
+ 
+Database.
+ 
+Is
+ 
+the
+ 
+Database
+ 
+returning
+ 
+null?
+ 
+Let
+ 
+me
+ 
+check
+ 
+the
+ 
+schema."
+ *    **The  "Hypothesis  Tree":**  The  AI  generates  3  possible  causes  and  "mentally  simulates"  
+them
+ 
+to
+ 
+see
+ 
+which
+ 
+one
+ 
+fits
+ 
+the
+ 
+evidence.
+  ####  3.  THE  SURGEON  (THE  FIX)  *    **The  Action:**  Apply  the  patch.  *    **The  Verification:**  A  Billion-Dollar  system  doesn't  just  write  code.  It  **writes  a  test  case**.      *    *Step  A:*  Write  a  test  that  *fails*  (reproducing  the  bug).      *    *Step  B:*  Apply  the  fix.      *    *Step  C:*  Run  the  test.  If  it  passes,  *then*  show  the  user.   ###  III.  HOW  TO  BUILD  THIS  IN  AUREON  (THE  IMPLEMENTATION)
+
+####  A.  THE  "LSP"  HOOK  (LANGUAGE  SERVER  PROTOCOL)  *    **The  Tech:**  VS  Code  uses  "LSP"  to  talk  to  the  compiler.  *    **The  Hack:**  Hook  into  the  LSP  Diagnostics.      *    When  a  Red  Squiggly  Line  appears,  Aureon  should  *automatically*  read  the  error  code  
+(e.g.,
+ 
+`TS2322`).
+     *    Aureon  then  queries  the  LSP  for  "Go  to  Definition"  of  the  variables  involved.      *    It  bundles  this  (Error  +  Definition  +  Usage)  into  the  prompt.   ####  B.  THE  "RUNTIME"  HOOK  (THE  CRASH  REPORT)  *    **The  Tech:**  When  the  app  crashes,  it  dumps  a  stack  trace  to  the  terminal.  *    **The  Hack:**  Aureon  watches  the  terminal  output.      *    **Regex  Trigger:**  If  it  sees  `Error:`,  `Exception`,  or  `Panic`:      *    **Action:**  It  parses  the  filename  and  line  number  (e.g.,  `main.py:45`).      *    **Auto-Read:**  It  reads  `main.py`  lines  30-60  automatically.      *    **Auto-Prompt:**  "I  detected  a  crash  at  line  45.  Here  is  the  context.  Fix  it."   ####  C.  THE  "REFLECTION"  LOOP  (CHAIN  OF  THOUGHT)  *    **The  Prompt  Engineering:**  Do  not  ask  "How  to  fix  this?"  *    **The  Elite  Prompt:**      ```text      SYSTEM:  You  are  a  Senior  Principal  Engineer  at  Google.      TASK:  Analyze  this  error.      STEP  1:  Explain  the  code's  intended  logic.      STEP  2:  Explain  why  the  error  occurred  (Root  Cause).      STEP  3:  Propose  3  solutions.      STEP  4:  Select  the  best  solution  and  explain  WHY  it  is  safe  (No  side  effects).      STEP  5:  Write  the  code.      ```   ###  IV.  THE  "HIDDEN"  KNOWLEDGE:  RAG  FOR  DEBUGGING  *    **The  Secret  Weapon:**  Companies  like  Meta  index  their  *entire  codebase*  and  
+*documentation*
+ 
+into
+ 
+a
+ 
+Vector
+ 
+Database
+ 
+(RAG).
+ *    **The  Workflow:**      1.   Error:  "Method  'XYZ'  not  found."      2.   Standard  AI:  "I  don't  know  what  XYZ  is."      3.   Elite  AI  (RAG):  Searches  the  Vector  DB  for  "XYZ".  Finds  it  was  renamed  to  "ABC"  in  a  pull  
+request
+ 
+2
+ 
+weeks
+ 
+ago.
+     4.   Fix:  "You  are  using  an  old  method  name.  It  was  renamed  to  'ABC'.  Update  line  40."   ###  V.  SUMMARY:  THE  "GOD  MODE"  DEBUGGER  To  replicate  this  in  Aureon,  you  need:  1.   **Terminal  Watcher:**  Auto-detect  crashes.  2.   **LSP  Integration:**  Auto-read  variable  definitions.
+
+3.   **RAG  Memory:**  Remember  previous  bugs  and  codebase  structure.  4.   **Chain  of  Thought:**  Force  the  AI  to  "think"  before  coding.

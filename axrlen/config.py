@@ -38,6 +38,7 @@ class Settings:
     clob_api_secret: str
     clob_api_passphrase: str
     brains_dir: Path
+    brains_max_chars: int
     max_ai_retries: int
     ai_timeout_seconds: float
 
@@ -120,6 +121,7 @@ def load_settings() -> Settings:
         clob_api_secret=os.getenv("CLOB_API_SECRET", "").strip(),
         clob_api_passphrase=os.getenv("CLOB_API_PASSPHRASE", "").strip(),
         brains_dir=brains_dir,
+        brains_max_chars=_env_int("BRAINS_MAX_CHARS", 250_000, 50_000, 500_000),
         max_ai_retries=_env_int("MAX_AI_RETRIES", 3, 1, 5),
         ai_timeout_seconds=_env_float("AI_TIMEOUT_SECONDS", 60.0, 10.0, 180.0),
     )

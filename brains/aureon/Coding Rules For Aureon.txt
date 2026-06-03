@@ -1,0 +1,3044 @@
+Coding Rules For Aureon:
+
+I. Core Principles for All Code
+System 2 Forcing: Before coding, explicitly list distinct logical steps, then explain potential pitfalls for each. Only then commence coding.
+Expert Domain Specificity: Tailor coding approach to the domain (e.g., memory-aware for systems, security-first for web, scalability for data).
+Negative Constraints:
+NEVER invent library functions that do not exist.
+NEVER use deprecated patterns when modern alternatives are available.
+NEVER write code that loads entire datasets into memory when streaming is feasible.
+Code Quality Standards:
+All code MUST be production-grade, typed, and documented.
+Adhere to DRY (Don't Repeat Yourself) principles.
+Prioritize guard clauses over nested if/else statements.
+Implement proper error handling with specific exception types.
+Adopt a security-first mindset: use parameterized queries, validate all inputs, and trust NO input.
+Recursive Self-Correction (The Critic-Actor Loop):
+After initial code, act as a Senior Code Reviewer: identify O(n²) loops, security flaws, and poor naming.
+Test against at least 10 edge cases (empty inputs, huge files, unicode, network timeouts, null values).
+Rewrite code incorporating all feedback.
+Calculate Big O notation; if worse than O(n log n), optimize without prompting.
+Lore-to-Code Pipeline: Every variable name, string, and UI label MUST reflect the project's world/context. Avoid generic terms.
+II. Architecture & Design Directives
+Asynchronous-First Architecture: All AI model interactions MUST be abstracted through a 'ModelGateway' interface for provider-agnosticism.
+Resource Budgets: Implement strict max_tokens and max_retries in every service constructor.
+N+1 Inference: AVOID by batching requests.
+Defensive Prompting: Isolate user content in XML blocks.
+Idempotence & Traceability: Ensure all stateful operations are idempotent and include a correlation_id for distributed tracing.
+Atomic Design & Headless Logic: Strictly enforce this for frontend. Business logic and AI-stream handling MUST reside in custom hooks, NEVER in JSX components.
+Schema-First Approach: Validate all data ingress at the architectural boundary using a schema-first approach before it interacts with internal business logic.
+III. Security Protocols
+Zero-Trust Architecture: Validate all inputs.
+Constant-Time Comparisons: Use for secrets.
+Encryption: Encrypt all state backends and transit paths.
+Least Privilege: Enforce IAM policies with specific Resource ARNs; reject Action: *.
+Immutable Infrastructure: Use Packer/Docker for images rather than remote-exec provisioning.
+Input Validation: Validate all inputs for injection vectors in user-data scripts.
+Credential Handling:
+NEVER hardcode credentials; use OIDC or Vault integration.
+If a secret MUST be handled, reference it via a Secret Manager ARN, NEVER an environment variable string.
+NEVER store credentials in LocalStorage; use HttpOnly or Memory state.
+Sanitization: Sanitize all dynamic LLM outputs using DOMPurify-like logic to prevent XSS.
+PII Stripping: Strip PII/Sensitive context from all frontend loggers.
+Cryptographic Key Sizes: Enforce a minimum RSA key size of 4096 bits.
+Nonces: Use deterministic construction for AES-GCM or XChaCha20-Poly1305.
+Memory Scrubbing: Utilize memory-scrubbing types for all sensitive cryptographic material.
+Constant-Time Equality Checks: For authentication tag and signature verifications.
+CSPRNGs: Cryptographic entropy MUST be sourced from a CSPRNG.
+IV. Performance & Optimization Mandates
+Big O Notation: Calculate for every code block; rewrite if worse than O(n log n).
+Chaos Monkey Injection: Assume APIs have 50% packet loss and 2000ms latency. Implement Retry with Exponential Backoff. Handle disk full, memory overflow, and network rot gracefully.
+Streaming-First: Optimize for token-by-token rendering using memoization and localized state to prevent layout thrashing.
+Token Batching: Any component displaying AI streaming text MUST utilize token-batching/requestAnimationFrame; NEVER sync state per-character.
+State Throttling: State updates during streaming MUST be throttled to 16ms intervals or use requestAnimationFrame.
+Memory Optimization: Utilize TypedArrays (Float32Array, Float64Array) for high-frequency feature storage. Eliminate array spread operators and concatenations in hot paths.
+Cache Management: Generate cache keys using fixed-size cryptographic hashes. Enforce cache eviction via LRU or LFU strategies.
+Decoupling: Decouple expensive data processing and collection filtering from the critical request path by pre-calculating and caching results.
+Concurrency: Prohibit empty-loop busy-waiting; utilize platform-native poll, nanosleep, or futex syscalls.
+Data Pipeline Efficiency: Eliminate O(N) process forking by using streaming processors. Keep FIFOs and stream pipes open across read/write cycles.
+V. Debugging & Reliability Standards
+The Scout (Context Gathering): Identify stack trace, map related code files, consider recent changes, bundle error + definition + usage.
+The Diagnostician (Root Cause Analysis): Do NOT fix symptoms; find the disease. Use the "Rubber Duck" Protocol. Generate a "Hypothesis Tree."
+The Surgeon (The Fix): Apply the patch with precision. Verify with a mental test case. Explain WHY the fix is safe.
+Reflection Loop: Explain intended logic, root cause, propose 3 solutions, select best, deliver.
+Isolation Chamber: Extract the failing function into a standalone context with hardcoded inputs.
+Error Boundaries: Every AI-generated content block MUST be wrapped in a local ErrorBoundary to prevent model hallucinations from crashing the SPA.
+Retry-CircuitBreaker: Every LLM interaction MUST be wrapped in a Retry-CircuitBreaker pattern with a 30s timeout.
+Schema Strictness: Use Pydantic V2 for all data modeling; NEVER trust raw dictionary access for model outputs.
+Traceability: Inject an x-aureon-trace-id in every internal module call for recursive debugging.
+Crash-Safe Bootstrap: Implement logic where orphaned temporary files are transitioned to a recovery state for reprocessing.
+VI. Frontend-Specific Directives
+UI Frameworks: Use Tailwind CSS with Radix UI primitives ONLY.
+Accessibility: Every interactive custom element MUST have an aria-label and support keyboard Enter/Space triggers.
+Responsiveness: Use Container Queries (@container) for dashboard widgets rather than viewport media queries.
+UI State: Prioritize 'Immutable UI State' and 'Atomic Design' principles.
+Content Visibility: Use Content-Visibility: Auto for long AI message lists.
+Loading Patterns: Implement 'Skeleton Loading' patterns for all async AI calls.
+DOM Sanitization: All AI-generated markdown MUST be sanitized via DOMPurify before rendering.
+Anti-AI-Slop Directive:
+Output is REJECTED if: generic fonts as primary, purple/blue AI gradients, centered single-column layouts, generic card grids, buttons without hover/active/focus states, instant show/hide without animation, Lorem ipsum, or "Submit" labels.
+ZERO placeholder content (no Lorem ipsum, no TODO).
+COMPLETE, RUNNABLE code, not fragments.
+Visually competitive with $1B+ products.
+Every interaction MUST feel physical.
+MUST work on EVERY device.
+VII. Backend & Data Engineering Directives
+Vector-Relational Cohesion: Prioritize. NEVER generate raw vector search queries without explicit Row Level Security (RLS) predicates.
+Fetch-then-Close: Use for any AI-related data fetching to prevent connection pooling deadlocks.
+Vector Indexes: All vector indexes MUST include quantization (PQ) by default unless low-latency/high-precision is explicitly requested.
+Upsert Logic: Use with conflict resolution for all high-velocity ingestion.
+JSONB Schema Validation: Enforce using CHECK constraints for unstructured AI metadata.
+Data Pipeline Idempotence: All state transitions and writes MUST be idempotent.
+VIII. Computational Linguistics Protocols
+Context-Isolation Pattern: Every external string MUST be treated as untrusted and wrapped in unique XML delimiters.
+Hard-Stop Token Calculator: All LLM-facing code MUST implement a 'Hard-Stop' token calculator.
+Regex Audits: Any regex-based text cleaning MUST be benchmarked against 1k repeated characters to prevent ReDoS.
+Pydantic for NLP Output: Use for all NLP output structures; naked eval() or json.loads() on model output without secondary schema-validation is strictly prohibited.
+NFKC Normalization: Enforce on all text inputs before embedding generation or string comparison.
+Stream-First Linguistic Architecture: NEVER assume constant string length; use byte-offsets for multi-byte character safety.
+Decouple Tokenization: Decouple from feature extraction using the Strategy pattern.
+Lazy Loading/Memoization: For heavy model weights and repetitive morphological transformations.
+IX. Concurrency & Parallelism Mandates
+Atomic Primitives: Use for "check-then-act" sequences and shared counters. Replace boolean-based flag checks with hardware-level atomic primitives.
+Thread-Safe State: Maintain a persistent, thread-safe state for Task Graphs and Dependency Registries.
+Atomic Operations: Reserve unique identifiers and sequence numbers using Atomic::fetch_add BEFORE validation logic.
+Non-Blocking Execution: Avoid blocking execution threads with sleep or wait commands; utilize non-blocking schedulers or event-driven triggers.
+Mutex Guards: Release before signaling Condition Variables.
+Resource Management: Implement the Drop trait or use "Scope Guards" for all resource managers to ensure graceful shutdown.
+True Parallelism: Enforce via OS-level threads or worker pools rather than sequential round-robin loops.
+
+YEAR 2026
+
+Coding Rules:
+
+Security-first design before feature implementation.
+
+Zero-trust assumptions for all inputs.
+
+Modular microservice boundaries strictly enforced.
+
+AI-generated code must be reviewed manually.
+
+Functions must not exceed logical single responsibility.
+
+Explicit error handling required for all external calls.
+
+Immutable data structures preferred.
+
+Strict type enforcement even in dynamic languages.
+
+Observability hooks built into all services.
+
+Performance budgets defined before optimization.
+
+Debugging Rules:
+
+Always reproduce issue in isolated environment.
+
+Use distributed tracing before modifying code.
+
+Validate logs before assuming logic fault.
+
+Confirm data integrity across services.
+
+Roll back recent deployments before deep patching.
+
+Use automated regression tests before fix merge.
+
+Monitor production metrics after fix.
+
+Never patch without root cause analysis.
+
+Confirm security implications of bug.
+
+Document failure pattern for AI training systems.
+
+Prompt Logic Example:
+Input → Validate → Authorize → Process → Log outcome → Return sanitized response.
+
+YEAR 2025
+
+Coding Rules:
+
+All endpoints require authentication middleware.
+
+CI pipelines mandatory for merge.
+
+Use infrastructure-as-code.
+
+Avoid hidden side effects in async calls.
+
+Enforce naming consistency across repos.
+
+Limit nested logic depth.
+
+Prefer composition over inheritance.
+
+Use structured logging format.
+
+Version APIs explicitly.
+
+Fail fast on invalid state.
+
+Debugging Rules:
+
+Compare staging vs production configs.
+
+Inspect container logs first.
+
+Reproduce in local container.
+
+Use step debugger only after logs reviewed.
+
+Check dependency updates.
+
+Inspect API response codes.
+
+Confirm timeout thresholds.
+
+Validate database migrations.
+
+Review recent pull requests.
+
+Add temporary telemetry for unclear flows.
+
+Prompt Logic Example:
+User request → Token verification → Route handler → Business logic → Database call → Structured log.
+
+YEAR 2024
+
+Coding Rules:
+
+Input validation centralized.
+
+Use async patterns properly.
+
+Avoid blocking I/O.
+
+Maintain clean separation of UI and logic.
+
+Environment variables never hardcoded.
+
+Encrypt sensitive data at rest.
+
+Rate limiting required.
+
+Document public methods.
+
+Keep dependencies minimal.
+
+Linting must pass before commit.
+
+Debugging Rules:
+
+Check environment mismatches.
+
+Verify API gateway configs.
+
+Inspect cache invalidation logic.
+
+Clear local cache before retest.
+
+Compare error stack with source maps.
+
+Confirm TLS certificates.
+
+Validate queue backlogs.
+
+Simulate load locally.
+
+Re-run failing test suite.
+
+Add guard logs around suspected block.
+
+Prompt Logic Example:
+Receive input → Sanitize → Validate schema → Execute logic → Return JSON response.
+
+YEAR 2023
+
+Coding Rules:
+
+Write test before feature when possible.
+
+Avoid monolithic architecture.
+
+Keep database queries optimized.
+
+Use clear commit messages.
+
+Feature flags for risky releases.
+
+Strict CORS policies.
+
+Handle null states explicitly.
+
+Use modern language standards.
+
+Remove dead code promptly.
+
+Maintain documentation in repo.
+
+Debugging Rules:
+
+Check failing unit tests first.
+
+Inspect database query plans.
+
+Use breakpoint for logic branch errors.
+
+Verify third-party service uptime.
+
+Inspect memory usage spikes.
+
+Validate API contracts.
+
+Roll back feature flag if needed.
+
+Trace request lifecycle.
+
+Monitor error aggregation tools.
+
+Confirm version mismatches.
+
+YEAR 2022
+
+Coding Rules:
+
+Adopt secure dependency management.
+
+Validate all third-party API responses.
+
+Use strict typing where supported.
+
+Avoid shared mutable state.
+
+Implement centralized error handling.
+
+Design APIs RESTful and predictable.
+
+Protect against injection attacks.
+
+Implement input size limits.
+
+Log structured JSON events.
+
+Keep CI pipelines green before merge.
+
+Debugging Rules:
+
+Check dependency vulnerabilities.
+
+Inspect API latency metrics.
+
+Review recent dependency upgrades.
+
+Validate JWT tokens manually.
+
+Confirm CORS and firewall rules.
+
+Replicate bug using same payload.
+
+Inspect container resource limits.
+
+Confirm environment variables.
+
+Monitor background workers.
+
+Compare production vs staging behavior.
+
+Prompt Logic Example:
+Request arrives → Validate token → Validate payload schema → Execute business logic → Log structured event → Send response.
+
+YEAR 2021
+
+Coding Rules:
+
+Write idempotent APIs.
+
+Enforce input schemas.
+
+Use feature toggles for new releases.
+
+Separate configuration from logic.
+
+Use async processing for heavy tasks.
+
+Avoid deeply nested conditionals.
+
+Implement retry logic with limits.
+
+Ensure backward compatibility in APIs.
+
+Protect secrets with vault systems.
+
+Automate code formatting.
+
+Debugging Rules:
+
+Inspect API retry logs.
+
+Check message queue backlogs.
+
+Validate database transaction rollbacks.
+
+Review feature toggle state.
+
+Inspect CI test failures.
+
+Check rate limiting triggers.
+
+Validate TLS handshake issues.
+
+Compare request IDs in logs.
+
+Monitor memory leaks.
+
+Replicate race conditions locally.
+
+Prompt Logic Example:
+Client sends request → Schema validation → Check feature flag → Execute service → Store result → Return standardized response.
+
+YEAR 2020
+
+Coding Rules:
+
+Write clear, readable code over clever code.
+
+Implement automated testing suites.
+
+Use containerized environments.
+
+Avoid hard-coded credentials.
+
+Validate all user inputs.
+
+Keep services stateless when possible.
+
+Follow SOLID principles.
+
+Use version control branching strategies.
+
+Document APIs with OpenAPI specs.
+
+Enforce linting and formatting rules.
+
+Debugging Rules:
+
+Inspect container logs.
+
+Run failing unit tests locally.
+
+Review git commit history.
+
+Check environment parity.
+
+Validate dependency versions.
+
+Monitor CPU and memory usage.
+
+Use step-through debugger.
+
+Inspect stack traces.
+
+Reproduce issue with same dataset.
+
+Confirm database migration state.
+
+Prompt Logic Example:
+Initialize container → Load environment variables → Accept request → Validate → Process → Return JSON.
+
+YEAR 2019
+
+Coding Rules:
+
+Modularize large codebases.
+
+Write reusable components.
+
+Avoid duplication (DRY).
+
+Use async/await properly.
+
+Keep functions small.
+
+Follow naming conventions strictly.
+
+Add unit tests for new features.
+
+Use code reviews consistently.
+
+Manage dependencies carefully.
+
+Avoid global variables.
+
+Debugging Rules:
+
+Use breakpoints to inspect variables.
+
+Check promise rejections.
+
+Review API response codes.
+
+Inspect frontend console errors.
+
+Validate backend logs.
+
+Run integration tests.
+
+Check cross-browser compatibility.
+
+Validate database constraints.
+
+Confirm API endpoints correct.
+
+Compare working vs failing payloads.
+
+Prompt Logic Example:
+Button click → Trigger async call → Await response → Update state → Render output.
+
+YEAR 2018
+
+Coding Rules:
+
+Emphasize clean architecture patterns.
+
+Separate UI from business logic.
+
+Write integration tests.
+
+Optimize database queries.
+
+Avoid callback hell.
+
+Use consistent code style.
+
+Secure APIs with authentication.
+
+Validate client and server inputs.
+
+Monitor performance budgets.
+
+Keep documentation updated.
+
+Debugging Rules:
+
+Inspect network requests.
+
+Validate async flow.
+
+Check database indexing.
+
+Profile application performance.
+
+Review commit diffs.
+
+Inspect server logs.
+
+Simulate user flows.
+
+Clear caches before retest.
+
+Check memory consumption.
+
+Validate deployment configs.
+
+Prompt Logic Example:
+User action → Validate input → Execute controller → Query database → Return formatted response.
+
+YEAR 2017
+
+Coding Rules:
+
+Adopt microservice patterns.
+
+Ensure service isolation.
+
+Use dependency injection.
+
+Avoid tight coupling.
+
+Write RESTful endpoints.
+
+Implement caching strategies.
+
+Maintain semantic versioning.
+
+Use HTTPS everywhere.
+
+Keep codebase organized by feature.
+
+Write clear README documentation.
+
+Debugging Rules:
+
+Trace service-to-service calls.
+
+Inspect API gateway logs.
+
+Check container orchestration state.
+
+Validate service health endpoints.
+
+Confirm DNS routing.
+
+Review deployment pipelines.
+
+Inspect database replication.
+
+Reproduce issue in staging.
+
+Monitor error dashboards.
+
+Verify environment configs.
+
+Prompt Logic Example:
+Incoming request → API gateway → Service A processes → Calls Service B → Aggregate response → Return to client.
+
+YEAR 2016
+
+Coding Rules:
+
+Follow MVC separation.
+
+Write maintainable frontend components.
+
+Avoid monolithic code files.
+
+Secure session handling.
+
+Validate forms both client and server side.
+
+Implement consistent logging.
+
+Handle asynchronous errors.
+
+Keep third-party libraries updated.
+
+Minimize technical debt.
+
+Write unit tests for core logic.
+
+Debugging Rules:
+
+Inspect browser developer tools.
+
+Check server stack traces.
+
+Validate session cookies.
+
+Inspect network latency.
+
+Review dependency conflicts.
+
+Compare dev vs prod behavior.
+
+Validate routing configuration.
+
+Check database connectivity.
+
+Monitor memory usage.
+
+Reproduce with minimal dataset.
+
+Prompt Logic Example:
+Load page → User submits form → Validate fields → Save to database → Return success message.
+
+YEAR 2015
+
+Coding Rules:
+
+Write readable, self-documenting code.
+
+Follow consistent indentation.
+
+Avoid nested loops when possible.
+
+Use version control properly.
+
+Modularize large scripts.
+
+Validate input parameters.
+
+Comment complex logic.
+
+Avoid redundant computations.
+
+Use established frameworks.
+
+Separate configuration files.
+
+Debugging Rules:
+
+Print variable states.
+
+Use IDE debugger.
+
+Review recent commits.
+
+Check error stack trace.
+
+Validate file paths.
+
+Confirm server configuration.
+
+Check null reference errors.
+
+Compare expected vs actual output.
+
+Step through execution flow.
+
+Write temporary test scripts.
+
+Prompt Logic Example:
+Start application → Load config → Accept input → Validate → Process logic → Output result.
+
+YEAR 2014
+
+Coding Rules:
+
+Prefer composition over inheritance.
+
+Keep controllers thin and services thick.
+
+Avoid business logic inside UI components.
+
+Implement centralized logging.
+
+Validate API inputs with schema validators.
+
+Use dependency management tools consistently.
+
+Write reusable utility modules.
+
+Avoid hard-coded URLs.
+
+Secure password storage with hashing.
+
+Maintain backward compatibility.
+
+Debugging Rules:
+
+Inspect HTTP status codes.
+
+Validate JSON payload structure.
+
+Check authentication middleware.
+
+Monitor server CPU spikes.
+
+Reproduce issue with API client tools.
+
+Compare config files across environments.
+
+Inspect stack traces carefully.
+
+Confirm correct environment variables loaded.
+
+Validate database foreign key constraints.
+
+Review recent merges for regression.
+
+Prompt Logic Example:
+Client sends JSON → Middleware authenticates → Controller validates schema → Service processes → Database stores → Response returned.
+
+YEAR 2013
+
+Coding Rules:
+
+Keep frontend and backend loosely coupled.
+
+Write unit tests for utility functions.
+
+Avoid global scope pollution.
+
+Handle asynchronous callbacks properly.
+
+Normalize database schemas.
+
+Implement proper error objects.
+
+Maintain consistent naming conventions.
+
+Use REST standards.
+
+Avoid deeply nested callbacks.
+
+Write meaningful commit messages.
+
+Debugging Rules:
+
+Check callback execution order.
+
+Inspect promise chains.
+
+Monitor network tab in browser.
+
+Validate API endpoint routing.
+
+Confirm database connections active.
+
+Review console errors.
+
+Use logging to trace flow.
+
+Compare input vs processed output.
+
+Validate form data submission.
+
+Inspect dependency conflicts.
+
+Prompt Logic Example:
+User action → Async request → Server validation → Business logic → Database update → Response handled.
+
+YEAR 2012
+
+Coding Rules:
+
+Structure projects with clear folder hierarchy.
+
+Use MVC or similar architecture.
+
+Avoid inline SQL where possible.
+
+Sanitize user input.
+
+Separate configuration files.
+
+Implement reusable templates.
+
+Write basic integration tests.
+
+Use consistent indentation.
+
+Avoid duplicate logic blocks.
+
+Implement logging for major operations.
+
+Debugging Rules:
+
+Check SQL query syntax.
+
+Validate session management.
+
+Inspect server logs.
+
+Confirm route definitions.
+
+Use debugger step-through.
+
+Validate AJAX requests.
+
+Monitor memory allocation.
+
+Check file permission errors.
+
+Re-run failing tests.
+
+Compare dev and production settings.
+
+Prompt Logic Example:
+Page loads → User input submitted → Server sanitizes → Executes query → Returns result page.
+
+YEAR 2011
+
+Coding Rules:
+
+Keep scripts modular.
+
+Avoid mixing presentation and logic.
+
+Use version control branches.
+
+Write reusable classes.
+
+Handle exceptions gracefully.
+
+Document public methods.
+
+Avoid tight coupling.
+
+Use proper naming conventions.
+
+Validate data types.
+
+Limit function length.
+
+Debugging Rules:
+
+Print debug statements.
+
+Use IDE breakpoints.
+
+Inspect variable state changes.
+
+Review commit history.
+
+Check dependency versions.
+
+Validate file imports.
+
+Test edge cases.
+
+Confirm database queries.
+
+Monitor CPU usage.
+
+Reproduce minimal failing case.
+
+Prompt Logic Example:
+Initialize app → Load modules → Validate user input → Process data → Render output.
+
+YEAR 2010
+
+Coding Rules:
+
+Follow DRY principle.
+
+Use object-oriented patterns.
+
+Write maintainable methods.
+
+Keep functions focused.
+
+Use meaningful variable names.
+
+Comment complex logic.
+
+Avoid magic numbers.
+
+Implement consistent error handling.
+
+Use frameworks correctly.
+
+Write automated test cases.
+
+Debugging Rules:
+
+Check stack traces.
+
+Inspect object state.
+
+Validate loop boundaries.
+
+Review exception messages.
+
+Compare expected vs actual values.
+
+Test boundary inputs.
+
+Inspect framework configs.
+
+Check null references.
+
+Use logging for flow tracking.
+
+Step through execution line by line.
+
+Prompt Logic Example:
+Input received → Validate → Create object → Execute method → Return processed value.
+
+YEAR 2009
+
+Coding Rules:
+
+Encapsulate object properties.
+
+Use getters and setters.
+
+Avoid exposing internal state.
+
+Implement layered architecture.
+
+Separate data access logic.
+
+Validate input parameters.
+
+Avoid circular dependencies.
+
+Write integration tests.
+
+Keep code readable.
+
+Use configuration files.
+
+Debugging Rules:
+
+Inspect class instantiation.
+
+Check database queries.
+
+Review object relationships.
+
+Validate configuration paths.
+
+Test class methods independently.
+
+Check memory allocation.
+
+Inspect log files.
+
+Confirm exception handling.
+
+Validate API contracts.
+
+Re-run with debug mode enabled.
+
+Prompt Logic Example:
+Create object → Set properties → Call method → Persist data → Return status.
+
+YEAR 2008
+
+Coding Rules:
+
+Follow strict object-oriented design.
+
+Separate UI and business logic.
+
+Implement proper error logging.
+
+Avoid redundant loops.
+
+Write clear method signatures.
+
+Validate form inputs.
+
+Maintain coding standards.
+
+Avoid global variables.
+
+Use version control consistently.
+
+Write reusable libraries.
+
+Debugging Rules:
+
+Inspect method calls.
+
+Check inheritance hierarchies.
+
+Review database transactions.
+
+Validate user session state.
+
+Compare log timestamps.
+
+Reproduce using test dataset.
+
+Monitor memory leaks.
+
+Validate file paths.
+
+Inspect thread execution.
+
+Step through code carefully.
+
+Prompt Logic Example:
+User submits form → Validate → Create object → Save to database → Return confirmation.
+
+YEAR 2007
+
+Coding Rules:
+
+Follow structured programming principles.
+
+Avoid excessive nested conditionals.
+
+Separate configuration settings.
+
+Write modular functions.
+
+Validate inputs thoroughly.
+
+Use consistent formatting.
+
+Avoid code duplication.
+
+Implement exception handling.
+
+Comment complex algorithms.
+
+Maintain readable logic flow.
+
+Debugging Rules:
+
+Print intermediate results.
+
+Inspect control flow branches.
+
+Validate loop counters.
+
+Check null pointer errors.
+
+Review error logs.
+
+Compare expected outputs.
+
+Inspect database connectivity.
+
+Re-run with debug flags.
+
+Test edge cases.
+
+Simplify failing code block.
+
+Prompt Logic Example:
+Start program → Accept input → Validate → Execute function → Output result.
+
+YEAR 2006
+
+Coding Rules:
+
+Follow layered architecture strictly.
+
+Keep business logic separate from data access.
+
+Avoid deeply nested if statements.
+
+Use consistent naming conventions.
+
+Validate all external inputs.
+
+Encapsulate reusable utilities.
+
+Implement proper exception propagation.
+
+Maintain configuration in external files.
+
+Avoid tight coupling between modules.
+
+Write documentation for public APIs.
+
+Debugging Rules:
+
+Trace method call hierarchy.
+
+Inspect configuration mismatches.
+
+Validate database transactions.
+
+Monitor thread behavior.
+
+Check memory allocation patterns.
+
+Review exception stack traces.
+
+Compare development vs production config.
+
+Test modules independently.
+
+Add temporary debug logging.
+
+Reproduce issue in controlled environment.
+
+Prompt Logic Example:
+Program starts → Load configuration → Validate input → Execute service layer → Store result → Return response.
+
+YEAR 2005
+
+Coding Rules:
+
+Use object-oriented design consistently.
+
+Separate UI, logic, and data layers.
+
+Avoid hard-coded database queries.
+
+Implement reusable components.
+
+Validate user sessions.
+
+Keep methods concise.
+
+Follow consistent indentation.
+
+Use proper access modifiers.
+
+Avoid circular dependencies.
+
+Write unit tests where possible.
+
+Debugging Rules:
+
+Check class instantiation.
+
+Inspect database query results.
+
+Validate session tokens.
+
+Review application logs.
+
+Step through execution in IDE.
+
+Compare expected vs actual return values.
+
+Monitor CPU spikes.
+
+Validate external service connections.
+
+Test edge cases.
+
+Isolate failing module.
+
+Prompt Logic Example:
+User login → Validate credentials → Create session → Load dashboard data → Render output.
+
+YEAR 2004
+
+Coding Rules:
+
+Keep scripts modular.
+
+Avoid mixing presentation with logic.
+
+Sanitize user inputs.
+
+Maintain consistent file structure.
+
+Use configuration constants.
+
+Implement basic error handling.
+
+Write reusable functions.
+
+Avoid redundant database calls.
+
+Document core algorithms.
+
+Follow coding standards across team.
+
+Debugging Rules:
+
+Print variable values.
+
+Check SQL syntax.
+
+Inspect form submission data.
+
+Validate routing logic.
+
+Review log files.
+
+Confirm file permissions.
+
+Reproduce error with same input.
+
+Inspect browser console.
+
+Check memory leaks.
+
+Simplify failing function.
+
+Prompt Logic Example:
+Receive form input → Sanitize → Query database → Process results → Display page.
+
+YEAR 2003
+
+Coding Rules:
+
+Emphasize maintainable code.
+
+Separate data models from controllers.
+
+Validate database inputs.
+
+Avoid duplicate business logic.
+
+Use consistent variable naming.
+
+Write basic integration tests.
+
+Handle exceptions properly.
+
+Avoid global scope usage.
+
+Comment non-obvious logic.
+
+Structure projects clearly.
+
+Debugging Rules:
+
+Inspect server logs.
+
+Validate SQL queries.
+
+Step through controller logic.
+
+Compare request parameters.
+
+Check object property values.
+
+Confirm database connectivity.
+
+Test boundary inputs.
+
+Inspect error messages.
+
+Trace execution path.
+
+Review recent code changes.
+
+Prompt Logic Example:
+Request received → Validate parameters → Execute business logic → Update database → Return confirmation.
+
+YEAR 2002
+
+Coding Rules:
+
+Use structured programming patterns.
+
+Avoid excessive global variables.
+
+Separate logic into functions.
+
+Validate user input early.
+
+Maintain consistent indentation.
+
+Write clear loop constructs.
+
+Use constants instead of magic numbers.
+
+Document function purpose.
+
+Avoid deep nesting.
+
+Reuse common utilities.
+
+Debugging Rules:
+
+Print intermediate outputs.
+
+Check loop termination conditions.
+
+Validate input parsing.
+
+Inspect memory usage.
+
+Step through execution.
+
+Confirm database results.
+
+Compare expected output.
+
+Simplify complex conditionals.
+
+Test with minimal data.
+
+Review code for syntax errors.
+
+Prompt Logic Example:
+Start script → Parse input → Validate → Execute function → Output result.
+
+YEAR 2001
+
+Coding Rules:
+
+Follow object-oriented best practices.
+
+Encapsulate class members.
+
+Avoid mixing UI and logic.
+
+Implement exception handling.
+
+Use configuration files.
+
+Validate data types.
+
+Maintain modular structure.
+
+Comment complex sections.
+
+Avoid redundant calculations.
+
+Write reusable classes.
+
+Debugging Rules:
+
+Inspect class constructors.
+
+Validate object states.
+
+Check database transactions.
+
+Review exception logs.
+
+Confirm method return values.
+
+Test edge case inputs.
+
+Compare expected vs actual results.
+
+Use IDE debugging tools.
+
+Simplify failing logic.
+
+Re-run with debug flags enabled.
+
+Prompt Logic Example:
+Create class instance → Set properties → Call processing method → Save result → Return status.
+
+YEAR 2000
+
+Coding Rules:
+
+Prepare code for Y2K-safe date handling.
+
+Validate date inputs carefully.
+
+Use structured programming.
+
+Separate modules clearly.
+
+Avoid global state where possible.
+
+Comment legacy logic.
+
+Write maintainable procedures.
+
+Use proper error codes.
+
+Maintain consistent formatting.
+
+Test boundary conditions.
+
+Debugging Rules:
+
+Validate date formatting.
+
+Inspect legacy system compatibility.
+
+Check memory allocation.
+
+Review function calls.
+
+Test leap year calculations.
+
+Confirm database schema.
+
+Print intermediate outputs.
+
+Step through loops.
+
+Validate error codes.
+
+Compare system clocks.
+
+Prompt Logic Example:
+Input date → Validate format → Process calculation → Store result → Output confirmation.
+
+YEAR 1999
+
+Coding Rules:
+
+Write modular C/C++ programs.
+
+Avoid goto statements.
+
+Validate input buffers.
+
+Prevent buffer overflow.
+
+Comment complex algorithms.
+
+Separate header and source files.
+
+Keep functions concise.
+
+Use meaningful variable names.
+
+Avoid memory leaks.
+
+Follow consistent code style.
+
+Debugging Rules:
+
+Use debugger to inspect memory.
+
+Check pointer validity.
+
+Validate loop boundaries.
+
+Inspect segmentation faults.
+
+Print debug statements.
+
+Review compiler warnings.
+
+Test boundary inputs.
+
+Confirm correct memory freeing.
+
+Step through assembly if needed.
+
+Compare expected output manually.
+
+Prompt Logic Example:
+Initialize variables → Validate input → Execute function → Free memory → Return result.
+
+YEAR 1998
+
+Coding Rules:
+
+Prevent buffer overflows.
+
+Validate all pointer usage.
+
+Separate interface from implementation.
+
+Minimize global variables.
+
+Use consistent indentation.
+
+Document header files clearly.
+
+Handle file I/O errors.
+
+Avoid deep nested loops.
+
+Modularize large programs.
+
+Compile with warnings enabled.
+
+Debugging Rules:
+
+Inspect segmentation faults.
+
+Use memory debugging tools.
+
+Review compiler warnings carefully.
+
+Print pointer addresses.
+
+Validate array bounds.
+
+Step through with debugger.
+
+Inspect stack traces.
+
+Confirm memory deallocation.
+
+Reproduce crash with same input.
+
+Check return codes of system calls.
+
+Prompt Logic Example:
+Initialize buffer → Validate input size → Process data → Write output → Free allocated memory.
+
+YEAR 1997
+
+Coding Rules:
+
+Follow structured programming.
+
+Separate logic into small functions.
+
+Avoid goto statements.
+
+Validate user input early.
+
+Use clear naming conventions.
+
+Document algorithms.
+
+Handle errors explicitly.
+
+Keep header files minimal.
+
+Avoid unnecessary global state.
+
+Reuse utility functions.
+
+Debugging Rules:
+
+Trace control flow manually.
+
+Check loop exit conditions.
+
+Inspect pointer arithmetic.
+
+Review compiler error messages.
+
+Test with boundary inputs.
+
+Print variable states.
+
+Validate file operations.
+
+Confirm correct linking of libraries.
+
+Inspect stack memory.
+
+Simplify failing code block.
+
+Prompt Logic Example:
+Receive input → Validate → Execute function → Return processed value → Display output.
+
+YEAR 1996
+
+Coding Rules:
+
+Emphasize modular C/C++ design.
+
+Encapsulate data in structures.
+
+Avoid mixing logic and I/O.
+
+Validate file handles.
+
+Use consistent formatting.
+
+Comment complex pointer logic.
+
+Avoid hard-coded constants.
+
+Break large programs into modules.
+
+Handle memory allocation carefully.
+
+Compile with strict flags.
+
+Debugging Rules:
+
+Check malloc return values.
+
+Inspect pointer dereferencing.
+
+Validate array indexing.
+
+Step through execution.
+
+Review core dumps.
+
+Test edge case inputs.
+
+Inspect compiler warnings.
+
+Confirm proper freeing of memory.
+
+Trace function call order.
+
+Compare expected vs actual output.
+
+Prompt Logic Example:
+Allocate memory → Validate allocation → Process structure → Output result → Free memory.
+
+YEAR 1995
+
+Coding Rules:
+
+Write structured C programs.
+
+Avoid excessive nesting.
+
+Validate buffer sizes.
+
+Comment algorithm logic.
+
+Separate business logic from UI.
+
+Use clear variable names.
+
+Keep functions short.
+
+Avoid global mutable variables.
+
+Handle file I/O safely.
+
+Maintain consistent brace style.
+
+Debugging Rules:
+
+Use debugger to step through loops.
+
+Print intermediate values.
+
+Inspect pointer validity.
+
+Check for memory leaks.
+
+Validate file paths.
+
+Review compiler diagnostics.
+
+Test boundary conditions.
+
+Confirm return values.
+
+Trace execution manually.
+
+Recompile with debug symbols.
+
+Prompt Logic Example:
+Open file → Validate → Read data → Process algorithm → Write result → Close file.
+
+YEAR 1994
+
+Coding Rules:
+
+Follow ANSI C standards.
+
+Separate header and source files.
+
+Avoid implicit type conversions.
+
+Validate input streams.
+
+Write portable code.
+
+Avoid machine-specific hacks.
+
+Document function prototypes.
+
+Limit function complexity.
+
+Use constants for configuration.
+
+Handle error codes properly.
+
+Debugging Rules:
+
+Inspect compiler warnings.
+
+Validate type casting.
+
+Check array boundaries.
+
+Step through logic branches.
+
+Print debug logs.
+
+Test with various input sizes.
+
+Confirm file descriptors valid.
+
+Inspect runtime errors.
+
+Compare expected algorithm results.
+
+Simplify nested logic.
+
+Prompt Logic Example:
+Initialize program → Parse input → Validate types → Execute algorithm → Output result.
+
+YEAR 1993
+
+Coding Rules:
+
+Follow structured programming strictly.
+
+Avoid global variable overuse.
+
+Validate numeric ranges.
+
+Write reusable utility functions.
+
+Document assumptions.
+
+Keep control flow simple.
+
+Avoid redundant calculations.
+
+Handle null pointers.
+
+Use consistent naming.
+
+Separate modules clearly.
+
+Debugging Rules:
+
+Trace loop counters.
+
+Inspect variable initialization.
+
+Check pointer assignments.
+
+Validate input parsing.
+
+Use step debugging.
+
+Review compiler errors.
+
+Confirm correct linking.
+
+Test boundary conditions.
+
+Inspect stack overflows.
+
+Compare expected outputs manually.
+
+Prompt Logic Example:
+Input number → Validate range → Compute result → Return value → Display.
+
+YEAR 1992
+
+Coding Rules:
+
+Emphasize procedural clarity.
+
+Break logic into small functions.
+
+Validate input parameters.
+
+Avoid mixing global and local scope.
+
+Document algorithms.
+
+Use consistent formatting.
+
+Avoid magic numbers.
+
+Handle error returns.
+
+Test modules independently.
+
+Maintain portable code.
+
+Debugging Rules:
+
+Print intermediate results.
+
+Validate loop conditions.
+
+Inspect function return values.
+
+Review compile-time warnings.
+
+Step through execution.
+
+Confirm memory allocation.
+
+Check boundary inputs.
+
+Simplify failing routine.
+
+Inspect file I/O operations.
+
+Compare against manual calculation.
+
+Prompt Logic Example:
+Receive data → Validate → Call function → Process → Output result.
+
+YEAR 1991
+
+Coding Rules:
+
+Follow structured programming.
+
+Avoid goto statements.
+
+Separate logic into procedures.
+
+Validate user inputs.
+
+Keep variable scope minimal.
+
+Use clear naming.
+
+Document complex math.
+
+Avoid deep nesting.
+
+Handle errors explicitly.
+
+Maintain readable indentation.
+
+Debugging Rules:
+
+Manually trace execution path.
+
+Print variable states.
+
+Inspect loop termination.
+
+Validate procedure calls.
+
+Review compiler messages.
+
+Check stack usage.
+
+Confirm correct parameter passing.
+
+Test edge case values.
+
+Compare expected vs actual results.
+
+Re-run with different inputs.
+
+Prompt Logic Example:
+Start program → Read input → Validate → Execute procedure → Print output.
+
+YEAR 1990
+
+Coding Rules:
+
+Use structured programming constructs only.
+
+Avoid goto except in controlled error exits.
+
+Keep functions under manageable size.
+
+Validate all external inputs.
+
+Separate logic into modules.
+
+Avoid global variable overuse.
+
+Use header files properly.
+
+Document function contracts.
+
+Compile with strict warnings enabled.
+
+Maintain portable code across systems.
+
+Debugging Rules:
+
+Inspect compiler warnings first.
+
+Step through execution with debugger.
+
+Check pointer arithmetic carefully.
+
+Validate array boundaries.
+
+Print intermediate values.
+
+Review stack trace.
+
+Test boundary inputs.
+
+Inspect memory allocation.
+
+Confirm correct linking.
+
+Compare manual vs program output.
+
+Prompt Logic Example:
+Initialize variables → Validate input → Call function → Process data → Return result.
+
+YEAR 1989
+
+Coding Rules:
+
+Follow ANSI C standards strictly.
+
+Encapsulate data using structs.
+
+Avoid implicit type conversions.
+
+Validate file operations.
+
+Keep functions single-purpose.
+
+Use descriptive identifiers.
+
+Separate interface from implementation.
+
+Avoid hard-coded constants.
+
+Document algorithm complexity.
+
+Ensure portability across compilers.
+
+Debugging Rules:
+
+Review compiler diagnostics.
+
+Inspect type casting.
+
+Check pointer dereferencing.
+
+Validate file descriptors.
+
+Trace control flow.
+
+Inspect core dumps.
+
+Confirm memory deallocation.
+
+Print debug logs.
+
+Test with large inputs.
+
+Compare results with known samples.
+
+Prompt Logic Example:
+Open file → Validate handle → Process records → Close file → Output summary.
+
+YEAR 1988
+
+Coding Rules:
+
+Follow structured programming discipline.
+
+Avoid global state where possible.
+
+Break large programs into smaller modules.
+
+Validate input ranges.
+
+Comment assembly-level optimizations.
+
+Keep indentation consistent.
+
+Use constants for configuration.
+
+Avoid deep nested loops.
+
+Document function parameters.
+
+Maintain consistent code formatting.
+
+Debugging Rules:
+
+Use command-line debugger.
+
+Inspect memory segments.
+
+Trace function calls manually.
+
+Validate loop conditions.
+
+Check stack overflow risks.
+
+Review segmentation faults.
+
+Test edge case data.
+
+Inspect register values if needed.
+
+Compare expected outputs.
+
+Simplify failing module.
+
+Prompt Logic Example:
+Load data → Validate → Execute loop → Update counters → Print results.
+
+YEAR 1987
+
+Coding Rules:
+
+Emphasize procedural clarity.
+
+Limit function length.
+
+Avoid excessive pointer arithmetic.
+
+Validate input buffers.
+
+Separate data definitions.
+
+Write reusable utility libraries.
+
+Avoid redundant calculations.
+
+Handle error codes explicitly.
+
+Maintain structured control flow.
+
+Document assumptions clearly.
+
+Debugging Rules:
+
+Print variable states.
+
+Inspect pointer values.
+
+Validate memory boundaries.
+
+Trace logic path step by step.
+
+Check return codes.
+
+Use debugger breakpoints.
+
+Inspect core dump files.
+
+Test boundary inputs.
+
+Review compiler warnings.
+
+Confirm function arguments passed correctly.
+
+Prompt Logic Example:
+Read input → Validate buffer → Execute function → Return processed output.
+
+YEAR 1986
+
+Coding Rules:
+
+Follow modular design principles.
+
+Separate hardware-specific code.
+
+Use header files consistently.
+
+Avoid excessive global variables.
+
+Validate numeric limits.
+
+Comment low-level optimizations.
+
+Keep logic structured.
+
+Avoid deep nested conditionals.
+
+Reuse tested routines.
+
+Maintain readable formatting.
+
+Debugging Rules:
+
+Trace execution manually.
+
+Inspect assembly if necessary.
+
+Validate memory usage.
+
+Check integer overflow.
+
+Review segmentation faults.
+
+Print debug statements.
+
+Test with minimal dataset.
+
+Confirm file I/O operations.
+
+Inspect stack behavior.
+
+Compare expected calculations.
+
+Prompt Logic Example:
+Initialize system → Read configuration → Validate values → Execute core routine → Output result.
+
+YEAR 1985
+
+Coding Rules:
+
+Emphasize structured programming.
+
+Limit global scope variables.
+
+Separate logic into procedures.
+
+Validate input before processing.
+
+Avoid goto statements.
+
+Document algorithm logic.
+
+Use meaningful variable names.
+
+Keep modules independent.
+
+Avoid redundant memory allocation.
+
+Maintain portability.
+
+Debugging Rules:
+
+Manually trace procedure flow.
+
+Inspect loop counters.
+
+Validate variable initialization.
+
+Check pointer arithmetic.
+
+Print intermediate outputs.
+
+Review compile-time warnings.
+
+Test boundary values.
+
+Inspect stack memory.
+
+Compare against manual results.
+
+Simplify complex procedure.
+
+Prompt Logic Example:
+Start program → Accept input → Validate → Process → Display result.
+
+YEAR 1984
+
+Coding Rules:
+
+Follow strict procedural structure.
+
+Avoid unstructured jumps.
+
+Validate file input.
+
+Keep routines short.
+
+Separate concerns logically.
+
+Comment complex mathematical logic.
+
+Avoid global state where possible.
+
+Maintain consistent naming.
+
+Use constants instead of literals.
+
+Ensure clear control flow.
+
+Debugging Rules:
+
+Trace program counter flow.
+
+Inspect file handles.
+
+Validate loop termination.
+
+Check memory boundaries.
+
+Print debug outputs.
+
+Inspect runtime errors.
+
+Confirm correct linking.
+
+Test with varied input.
+
+Compare expected vs actual.
+
+Recompile with debug symbols.
+
+Prompt Logic Example:
+Open input → Validate → Execute computation → Store result → Output.
+
+YEAR 1983
+
+Coding Rules:
+
+Follow structured programming guidelines.
+
+Break code into logical blocks.
+
+Avoid excessive global variables.
+
+Validate user input.
+
+Maintain readable indentation.
+
+Document algorithm design.
+
+Avoid deep nesting.
+
+Use modular file organization.
+
+Handle errors with return codes.
+
+Keep hardware-specific code isolated.
+
+Debugging Rules:
+
+Trace logic with debugger.
+
+Inspect memory allocation.
+
+Validate pointer references.
+
+Review compile warnings.
+
+Test edge cases.
+
+Print variable states.
+
+Inspect stack behavior.
+
+Confirm procedure calls.
+
+Compare manual calculations.
+
+Simplify failing block.
+
+Prompt Logic Example:
+Load program → Read input → Validate → Execute routine → Output result.
+
+YEAR 1982
+
+Coding Rules:
+
+Follow structured programming strictly.
+
+Avoid goto except controlled exits.
+
+Keep procedures focused on one task.
+
+Validate input immediately.
+
+Separate data definitions from logic.
+
+Use meaningful identifiers.
+
+Avoid global state where possible.
+
+Comment algorithm intent.
+
+Maintain consistent indentation.
+
+Isolate hardware-dependent code.
+
+Debugging Rules:
+
+Trace execution path manually.
+
+Inspect stack memory usage.
+
+Validate pointer assignments.
+
+Print intermediate values.
+
+Check loop termination conditions.
+
+Review compiler diagnostics.
+
+Test boundary conditions.
+
+Inspect file I/O return codes.
+
+Compare expected vs actual output.
+
+Simplify failing procedure.
+
+Prompt Logic Example:
+Start → Read input → Validate → Execute procedure → Output result.
+
+YEAR 1981
+
+Coding Rules:
+
+Use modular source files.
+
+Avoid deeply nested conditionals.
+
+Validate numeric ranges.
+
+Separate UI from computation logic.
+
+Document function parameters.
+
+Avoid redundant calculations.
+
+Use constants for configuration.
+
+Limit scope of variables.
+
+Follow compiler standards.
+
+Maintain readable formatting.
+
+Debugging Rules:
+
+Inspect segmentation faults.
+
+Validate array bounds.
+
+Trace function calls.
+
+Print variable values.
+
+Check stack overflow risks.
+
+Confirm memory deallocation.
+
+Test with edge inputs.
+
+Review compiler warnings.
+
+Inspect pointer arithmetic.
+
+Reproduce issue consistently.
+
+Prompt Logic Example:
+Initialize variables → Validate input → Perform calculation → Store result → Print output.
+
+YEAR 1980
+
+Coding Rules:
+
+Follow structured programming principles.
+
+Avoid arbitrary jumps.
+
+Keep subroutines short.
+
+Validate user input.
+
+Use clear variable names.
+
+Document mathematical logic.
+
+Avoid excessive global variables.
+
+Separate system-specific routines.
+
+Maintain consistent code style.
+
+Handle error codes properly.
+
+Debugging Rules:
+
+Trace control flow manually.
+
+Inspect register values when needed.
+
+Validate loop counters.
+
+Print intermediate results.
+
+Check memory usage.
+
+Review core dumps.
+
+Confirm correct linking.
+
+Test boundary values.
+
+Inspect stack frames.
+
+Compare with manual calculations.
+
+Prompt Logic Example:
+Load data → Validate → Call subroutine → Compute → Output result.
+
+YEAR 1979
+
+Coding Rules:
+
+Write portable C programs.
+
+Avoid machine-specific instructions.
+
+Keep functions modular.
+
+Validate input data.
+
+Comment system calls.
+
+Limit use of global variables.
+
+Maintain header/source separation.
+
+Avoid redundant loops.
+
+Document assumptions clearly.
+
+Use return codes consistently.
+
+Debugging Rules:
+
+Inspect system call return values.
+
+Trace file descriptors.
+
+Print debug output.
+
+Validate pointer usage.
+
+Check buffer sizes.
+
+Review compiler output.
+
+Test edge inputs.
+
+Inspect memory allocation.
+
+Simplify failing module.
+
+Compare expected results manually.
+
+Prompt Logic Example:
+Open resource → Validate handle → Process data → Close resource → Output status.
+
+YEAR 1978
+
+Coding Rules:
+
+Emphasize modular program design.
+
+Avoid global state where possible.
+
+Validate numeric input ranges.
+
+Use clear indentation.
+
+Separate hardware-specific code.
+
+Keep loops simple.
+
+Comment assembly interactions.
+
+Document file structures.
+
+Handle error returns explicitly.
+
+Keep procedures focused.
+
+Debugging Rules:
+
+Trace execution step by step.
+
+Inspect register and memory states.
+
+Validate loop conditions.
+
+Print intermediate counters.
+
+Check pointer boundaries.
+
+Review compilation warnings.
+
+Confirm file operations.
+
+Test boundary inputs.
+
+Compare results with expected tables.
+
+Simplify complex routines.
+
+Prompt Logic Example:
+Initialize system → Read record → Validate → Process → Output summary.
+
+YEAR 1977
+
+Coding Rules:
+
+Follow structured programming.
+
+Avoid excessive goto usage.
+
+Break program into logical modules.
+
+Validate input early.
+
+Document algorithm design.
+
+Keep variable scope minimal.
+
+Avoid redundant calculations.
+
+Separate logic from I/O.
+
+Maintain consistent formatting.
+
+Use meaningful identifiers.
+
+Debugging Rules:
+
+Manually trace program flow.
+
+Print variable states.
+
+Inspect memory addresses.
+
+Validate loop termination.
+
+Check stack usage.
+
+Review compile errors.
+
+Test with known datasets.
+
+Inspect file I/O return codes.
+
+Compare manual vs program output.
+
+Isolate failing module.
+
+Prompt Logic Example:
+Start → Accept input → Validate → Execute algorithm → Output result.
+
+YEAR 1976
+
+Coding Rules:
+
+Emphasize portability.
+
+Avoid machine-specific optimizations unless necessary.
+
+Keep subroutines small.
+
+Validate input buffers.
+
+Comment complex logic.
+
+Separate configuration values.
+
+Avoid global variables when possible.
+
+Maintain structured control flow.
+
+Use return codes for error handling.
+
+Keep code readable.
+
+Debugging Rules:
+
+Trace execution manually.
+
+Inspect memory boundaries.
+
+Validate pointer arithmetic.
+
+Print intermediate values.
+
+Check file descriptors.
+
+Review system call errors.
+
+Test boundary cases.
+
+Inspect stack growth.
+
+Compare results with expected values.
+
+Simplify failing function.
+
+Prompt Logic Example:
+Load configuration → Validate → Execute routine → Return result → Print.
+
+YEAR 1975
+
+Coding Rules:
+
+Follow strict structured programming.
+
+Avoid arbitrary jumps.
+
+Keep routines concise.
+
+Validate numeric inputs.
+
+Document mathematical formulas.
+
+Separate data and logic.
+
+Use consistent indentation.
+
+Avoid global state where possible.
+
+Handle error codes clearly.
+
+Maintain portable code.
+
+Debugging Rules:
+
+Trace program counter manually.
+
+Inspect variable initialization.
+
+Validate arithmetic overflow.
+
+Print intermediate results.
+
+Review compiler output.
+
+Test boundary values.
+
+Inspect stack memory.
+
+Confirm correct function calls.
+
+Compare with manual calculations.
+
+Simplify complex expressions.
+
+Prompt Logic Example:
+Input data → Validate → Compute formula → Store result → Output.
+YEAR 1974
+
+Coding Rules:
+
+Apply structured programming rigorously.
+
+Avoid goto except for controlled exits.
+
+Keep procedures single-purpose.
+
+Validate all numeric inputs.
+
+Separate data definitions from logic.
+
+Comment complex formulas.
+
+Maintain consistent indentation.
+
+Minimize global variables.
+
+Use clear loop constructs.
+
+Handle error returns explicitly.
+
+Debugging Rules:
+
+Manually trace execution path.
+
+Inspect loop counters carefully.
+
+Validate arithmetic operations.
+
+Print intermediate values.
+
+Check stack usage.
+
+Review compiler diagnostics.
+
+Test boundary conditions.
+
+Inspect memory allocation.
+
+Compare against hand calculations.
+
+Simplify failing routine.
+
+Prompt Logic Example:
+Read value → Validate range → Execute calculation → Store result → Display output.
+
+YEAR 1973
+
+Coding Rules:
+
+Emphasize portability across systems.
+
+Avoid hardware-specific assumptions.
+
+Keep subroutines short.
+
+Validate file operations.
+
+Separate I/O from computation.
+
+Use descriptive identifiers.
+
+Avoid redundant calculations.
+
+Maintain modular file organization.
+
+Document algorithm purpose.
+
+Use structured loops only.
+
+Debugging Rules:
+
+Inspect file descriptors.
+
+Validate system call returns.
+
+Trace control flow manually.
+
+Print debug outputs.
+
+Check pointer arithmetic.
+
+Review compilation warnings.
+
+Test edge case inputs.
+
+Inspect memory segments.
+
+Compare expected outputs.
+
+Isolate minimal failing example.
+
+Prompt Logic Example:
+Open file → Validate → Process records → Close file → Output summary.
+
+YEAR 1972
+
+Coding Rules:
+
+Follow structured programming discipline.
+
+Avoid excessive jumps.
+
+Keep modules independent.
+
+Validate input early.
+
+Comment system-level interactions.
+
+Use constants instead of literals.
+
+Separate configuration values.
+
+Limit variable scope.
+
+Maintain readable formatting.
+
+Use return codes consistently.
+
+Debugging Rules:
+
+Trace execution step by step.
+
+Inspect register values when needed.
+
+Validate loop conditions.
+
+Print intermediate counters.
+
+Check memory bounds.
+
+Review compiler messages.
+
+Test boundary data.
+
+Confirm correct linking.
+
+Inspect stack frames.
+
+Compare results manually.
+
+Prompt Logic Example:
+Initialize system → Accept input → Validate → Execute routine → Output result.
+
+YEAR 1971
+
+Coding Rules:
+
+Write portable system utilities.
+
+Keep functions small and reusable.
+
+Validate numeric ranges.
+
+Avoid global mutable state.
+
+Separate logic from I/O.
+
+Document assumptions clearly.
+
+Maintain consistent indentation.
+
+Avoid redundant loops.
+
+Handle errors explicitly.
+
+Keep code readable and simple.
+
+Debugging Rules:
+
+Manually trace logic branches.
+
+Inspect memory allocation.
+
+Validate pointer usage.
+
+Print debug statements.
+
+Check file operation returns.
+
+Test boundary conditions.
+
+Inspect system resource usage.
+
+Review compiler output.
+
+Compare with expected results.
+
+Simplify complex function.
+
+Prompt Logic Example:
+Load data → Validate → Process algorithm → Store result → Print.
+
+YEAR 1970
+
+Coding Rules:
+
+Follow strict structured programming.
+
+Avoid arbitrary jumps.
+
+Break programs into clear procedures.
+
+Validate all user input.
+
+Document mathematical logic.
+
+Separate machine-dependent sections.
+
+Use meaningful identifiers.
+
+Avoid deeply nested conditionals.
+
+Keep routines concise.
+
+Maintain consistent formatting.
+
+Debugging Rules:
+
+Trace program counter manually.
+
+Inspect variable initialization.
+
+Validate arithmetic overflow.
+
+Print intermediate outputs.
+
+Review compiler diagnostics.
+
+Test edge cases.
+
+Inspect stack behavior.
+
+Confirm procedure call order.
+
+Compare manual calculations.
+
+Simplify failing logic block.
+
+Prompt Logic Example:
+Start program → Read input → Validate → Compute result → Output value.
+
+YEAR 1969
+
+Coding Rules:
+
+Emphasize structured program flow.
+
+Avoid spaghetti code.
+
+Validate input data ranges.
+
+Keep procedures focused.
+
+Document algorithm design.
+
+Separate data from control logic.
+
+Use consistent indentation.
+
+Avoid excessive global variables.
+
+Use clear loop constructs.
+
+Handle errors with return flags.
+
+Debugging Rules:
+
+Perform desk checking manually.
+
+Trace flowcharts step by step.
+
+Validate loop counters.
+
+Print diagnostic outputs.
+
+Check arithmetic precision.
+
+Inspect memory allocation.
+
+Review compilation messages.
+
+Test with sample datasets.
+
+Compare with expected tables.
+
+Simplify algorithm for isolation.
+
+Prompt Logic Example:
+Input data → Validate → Execute flowchart steps → Store result → Output.
+
+YEAR 1968
+
+Coding Rules:
+
+Adopt structured programming principles.
+
+Eliminate unnecessary goto statements.
+
+Use block structures for control flow.
+
+Validate input at entry point.
+
+Document logic before coding.
+
+Separate concerns into modules.
+
+Avoid redundant computations.
+
+Use meaningful variable names.
+
+Maintain clear formatting.
+
+Keep procedures manageable in size.
+
+Debugging Rules:
+
+Walk through flowchart manually.
+
+Validate branch logic.
+
+Inspect loop termination.
+
+Print test values.
+
+Check arithmetic correctness.
+
+Review compiler output.
+
+Test boundary conditions.
+
+Inspect memory usage.
+
+Compare expected vs actual results.
+
+Reduce program to minimal failing case.
+
+Prompt Logic Example:
+Begin → Validate input → Follow structured blocks → Compute → Output result.
+
+YEAR 1967
+
+Coding Rules:
+
+Use structured blocks instead of jumps.
+
+Break programs into logical modules.
+
+Validate all inputs.
+
+Document algorithm steps.
+
+Maintain consistent indentation.
+
+Avoid deeply nested branches.
+
+Separate I/O from processing.
+
+Keep routines concise.
+
+Use clear naming.
+
+Follow compiler standards.
+
+Debugging Rules:
+
+Desk-check each step.
+
+Trace control flow manually.
+
+Validate condition branches.
+
+Print intermediate values.
+
+Check arithmetic overflow.
+
+Inspect loop counters.
+
+Review compiler messages.
+
+Test edge inputs.
+
+Compare with manual calculations.
+
+Simplify failing logic path.
+
+Prompt Logic Example:
+Read input → Validate → Execute structured blocks → Produce output.

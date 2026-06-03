@@ -1,0 +1,27 @@
+# Extracted from: Nestal Fractal Strategy.pdf
+
+2)  Only  trade  the  repeatable  “engine”  patterns  Pick  ONE  playbook  and  ignore  the  rest:    Sweep  →  Reclaim  (liquidity  grab)    Breakout  →  Retest  →  Continuation    Range  Fade  (mean  reversion  inside  a  box)  3)  Require  2  confirmations  before  entry    Structure  confirmation:  price  interacts  with  a  known  level  (session  high/low,  VWAP,  prior  
+swing,
+ 
+opening
+ 
+range).
+   Execution  confirmation:  reclaim/close  back  inside,  or  retest  hold,  or  rejection  wick  +  
+follow-through
+ 
+candle.
+ 4)  “Two  strikes”  rule  for  repetition    A  pattern  is  considered  repeating  only  after  it  works  twice  in  the  same  session  (two  clean  
+reactions
+ 
+with
+ 
+similar
+ 
+behavior).
+   The  third  attempt  is  where  traps  increase—either  reduce  size  or  demand  a  cleaner  trigger.  5)  Distance  +  time  filters  (to  avoid  forced  patterns)    Don’t  take  it  if  the  move  to  the  level  is  tiny:  require  ≥  0.5×  ATR(14)  on  your  trigger  timeframe.    Don’t  take  it  if  it’s  late-session  chop:  last  30–60  minutes  of  the  session  =  lower  quality  unless  
+volatility
+ 
+is
+ 
+expanding.
+ 6)  Risk  rules  (non-negotiable)    Stop  goes  beyond  the  level  that  “should  not  break.”    Sweep-reclaim:  stop  beyond  the  sweep  extreme.    Break-retest:  stop  beyond  the  retest  swing.    Range  fade:  stop  beyond  range  boundary.    Minimum  R:R  =  1.5R  (2R  preferred).    Max  2  losses  per  session  then  stop.  Max  3  trades  per  session.  7)  Invalidation  =  regime  flip  You  stop  trading  the  pattern  if  any  happens:    Session  box  breaks  and  holds  outside  (range  →  trend).    Volatility  expands  and  starts  gapping  through  levels  (your  stops  become  magnets).    The  pattern  fails  twice  (two  clean  invalidations).  You’re  done  for  that  session.

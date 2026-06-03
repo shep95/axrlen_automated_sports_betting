@@ -1,0 +1,185 @@
+ZERLAL — Full Expansion Blueprint
+What Glasswing Is Missing + What No One In The Market Is Building
+
+WHAT GLASSWING ACTUALLY IS (And What It Is NOT)
+Anthropic's Mythos Preview has identified thousands of zero-day vulnerabilities, many of which were critical and difficult to detect, including some in every major operating system and web browser. Fortune But here is the critical strategic gap: Glasswing is a closed consortium of 52 organizations. The preview is not going to be made generally available — 12 partner organizations form the core, though 40 organizations total will gain access. TechCrunch
+This means every government, bank, hospital, defense contractor, and tech company NOT on that list is completely unprotected and has no access to anything like this. That is your market. The entire world outside 52 companies.
+What Glasswing also does NOT have:
+
+No commercial product. It is a private research consortium, not software you can buy, deploy, or configure.
+No dashboard, no user interface, no real-time monitoring, no SIEM integration, no device scanning.
+No on-premise deployment for classified environments. It runs on Anthropic's cloud.
+The US Government has been blacklisted from working with Anthropic — the President ordered every federal agency to avoid Anthropic after they refused to remove safeguards on autonomous weapons. SecurityWeek This means the US government literally cannot use Glasswing. ZERLAL becomes the only AI-powered zero-day scanner US federal agencies can legally procure.
+
+Additionally, Accenture just launched Cyber.AI, powered by Claude, which helps organizations move from human-speed response to continuous AI-driven capabilities — but it requires Accenture's 30,000+ cybersecurity professionals as the delivery mechanism. Accenture It is a consulting services product. You cannot just buy it and run it. ZERLAL is the self-serve, deployable version of what they're building with armies of consultants.
+
+TIER 1 — FEATURES GLASSWING DOESN'T HAVE AT ALL
+1. OT / ICS / SCADA Critical Infrastructure Scanner
+This is the single biggest gap in the entire market and the one governments will pay the most for. By 2026, more than a third of global energy and utilities infrastructure will have experienced cyber pre-positioning activity — quiet access, data collection, and operational mapping by both human and AI-assisted adversaries. SC Media
+Glasswing only scans software code. It does not touch operational technology — the systems that run power grids, water treatment, oil pipelines, nuclear facilities, manufacturing floors, or transportation networks. Legacy industrial control systems built for reliability, not security, remain hard to patch, poorly segmented, and difficult to monitor. The traditional IT/OT air gap is largely gone. Infosecurity Magazine
+ZERLAL's OT module would: scan SCADA configurations, PLC firmware, industrial protocols (Modbus, DNP3, OPC-UA), HMI interfaces, and ICS network traffic for vulnerabilities. It would map the Purdue model architecture of an industrial facility, identify where IT and OT networks converge unsafely, and flag exactly which legacy device is the highest-risk entry point for an attacker trying to shut down a power plant. OT teams operate with limited visibility and specialized tooling — introducing AI without aligned frameworks risks creating uneven adoption and inconsistent decision-making across plants and operational sites. Industrial Cyber ZERLAL solves this with a purpose-built OT interface designed for plant operators, not security researchers.
+2. Nation-State Threat Attribution Engine
+Glasswing finds bugs. It does not tell you WHO is actively targeting your systems, HOW they operate, or WHAT their next move is. More attackers will simply walk in using valid credentials, abusing identity systems, single sign-on, and trusted AI agents to blend into normal activity. Attacks are becoming quiet, hard-to-spot campaigns rather than smash-through-the-front-door events. Nextgov.com
+ZERLAL's attribution engine continuously cross-references every finding and every anomaly in your environment against known nation-state TTPs (Tactics, Techniques, and Procedures). It maps everything to MITRE ATT&CK framework entries. When a vulnerability is discovered, it immediately answers: "Has this vulnerability class been weaponized by a known APT group? Which nations use it? Are there active campaigns using this right now?" It does not just say "you have a vulnerability." It says "Chinese state-sponsored group APT41 has active tooling that exploits exactly this class of vulnerability, and they targeted three companies in your sector last month."
+3. Autonomous Red Team Agent (Continuous Adversary Simulation)
+Glasswing scans for bugs. ZERLAL goes further — it continuously runs an autonomous red team against your own infrastructure, simulating what a nation-state attacker would actually do after finding entry. Not just "here is a buffer overflow" but "here is the full kill chain from initial entry to lateral movement to data exfiltration or system destruction, step by step, as an adversary would execute it."
+This is a persistent agent that never stops probing. Every time you push new code, every time you change a config, every time a new CVE drops, the red team agent re-runs against your live environment. Governments and financial institutions currently pay red team firms $500,000+ per engagement for a two-week exercise. ZERLAL does it continuously for a subscription fee.
+4. Quantum-Readiness Cryptographic Audit
+Quantum computing is right around the corner — it's one of the major themes at RSAC 2026 alongside AI. Dark Reading Every organization on the planet is running cryptographic systems that quantum computers will break. No one has a tool that systematically scans their entire codebase, infrastructure, and certificate store, identifies every non-quantum-safe algorithm in use (RSA, ECC, current TLS, etc.), and generates a prioritized migration roadmap to NIST post-quantum cryptography standards.
+ZERLAL's quantum audit module does exactly this. It scans code for cryptographic implementations, catalogs every certificate, maps every system that uses vulnerable encryption, and produces a phased migration plan to quantum-safe alternatives. This is a government mandate waiting to happen — and you will be the only product that offers it built-in.
+5. AI-Generated Code Security Layer
+Claude Code Security was launched in February 2026 as a tool that uses reasoning-based scanning to hunt down zero-day vulnerabilities in codebases — and cybersecurity stocks tumbled the day it was announced. Medium But it only scans existing code. It does not solve the new problem: developers are now writing code with AI assistants, and that AI-generated code ships with vulnerability patterns the AI learned from insecure training data.
+ZERLAL's AI Code Security layer sits in the developer pipeline. Every time a developer uses Copilot, Cursor, or any AI coding assistant to generate code, ZERLAL intercepts the output and runs it through an adversarial security audit before it is committed. It specifically looks for vulnerability patterns unique to AI-generated code — over-trusting input validation, predictable random seeds, weak authentication patterns that LLMs commonly reproduce. This is a category no one owns yet.
+
+TIER 2 — FEATURES THE MARKET HAS FRAGMENTS OF, BUT ZERLAL SHOULD UNIFY
+6. Full SIEM + SOC Integration Layer
+The 15 must-have SIEM features for modern threat defense include log collection and normalization, real-time event correlation, centralized dashboards, threat intelligence integration, UEBA, SOAR automation, alert prioritization, and compliance management. Splunk Every enterprise already has a SIEM — Splunk, Microsoft Sentinel, CrowdStrike, IBM QRadar. They pay millions for it. But none of their SIEMs can find zero-day vulnerabilities in their code.
+ZERLAL integrates INTO their existing SIEM as a data source. Every zero-day ZERLAL finds feeds directly into their security operations center as a structured alert with MITRE ATT&CK mapping, severity score, and remediation steps — formatted to the exact schema their SIEM expects. You are not asking them to replace their tools. You are plugging ZERLAL's discovery intelligence into tools they already trust and understand. This is how you get enterprise adoption in weeks rather than years.
+7. Dark Web and Threat Feed Intelligence
+Effective threat intelligence platforms monitor brand misuse, phishing sites, fake social media accounts, domain impersonations, and mobile app fraud — while alerting on leaked employee or customer credentials found on the dark web. ShadowDragon ZERLAL should build a dark web monitoring engine that specifically watches for: your organization's source code appearing for sale, your employees' credentials being traded, discussion of your specific software or infrastructure in threat actor forums, and active exploit code being developed for vulnerabilities in systems you use.
+This is the early warning layer. Before an attacker uses a vulnerability against you, they talk about it somewhere. ZERLAL listens to those conversations and alerts you before the attack happens.
+8. Third-Party and Supply Chain Risk Scanning
+Organizations with higher OT maturity report fewer incidents and faster recovery — and critical infrastructure attackers increasingly win through interconnectedness, not pure technical brilliance. Acsmi The most catastrophic breaches — SolarWinds, XZ Utils, Log4Shell — came through the supply chain. Your software is only as secure as every library, SDK, and third-party component embedded in it.
+ZERLAL's supply chain module maintains a live SBOM for every project and monitors every dependency in real time. The moment a CVE is published against any library in your stack, ZERLAL tells you instantly — not in the next scheduled scan, instantly. It also runs the ZERLAL vulnerability engine against the source code of your critical open-source dependencies, proactively hunting for bugs before they become public CVEs. This is what Glasswing does internally. ZERLAL gives it to every customer.
+9. Insider Threat and Behavioral Analytics (UEBA)
+Machine learning-driven UEBA (User and Entity Behavior Analytics) detects insider threats, compromised accounts, and zero-day attacks through AI-powered alert prioritization to reduce noise and focus on true positives. Exabeam The most dangerous threats are not always external attackers. Disgruntled employees, compromised credentials, and accidental data exfiltration cause the majority of breach events by dollar impact.
+ZERLAL's behavioral layer establishes a baseline of normal activity for every user and entity in an organization, then flags deviations — a developer downloading entire repository contents at 2am, a service account suddenly making API calls it has never made before, an admin account logging in from an unusual location. This turns ZERLAL from a code scanner into a full security intelligence platform.
+10. Sovereign / Data Embassy Mode
+Driven by national security imperatives, jurisdictional control concerns, and regulatory mandates about where data is processed and who can access it, 2026 will see the accelerated migration toward sovereign-hosted communications and cloud infrastructure. Governments and critical infrastructure operators will favor platforms built for autonomy — where infrastructure, keys, and data remain fully within their own authority. Dark Reading
+ZERLAL must offer a fully sovereign deployment mode — where the entire stack runs inside the customer's own data center or sovereign cloud region, with zero telemetry, zero callbacks to AUREON servers, and customer-controlled encryption keys. Every EU government, every defense ministry, every intelligence agency, and every financial regulator will require this before signing a contract. It is not optional for the enterprise tier. It is table stakes.
+
+TIER 3 — GOVERNMENT-SPECIFIC FEATURES THAT CREATE PERMANENT LOCK-IN
+11. CVE Pipeline and National Vulnerability Database Integration
+Build a direct integration with CISA, the NVD (National Vulnerability Database), and international equivalents. ZERLAL should be the system that feeds into these databases, not just consumes from them. When ZERLAL discovers a zero-day and responsible disclosure is complete, the CVE is filed through ZERLAL's platform automatically. Governments that use ZERLAL become the source of security intelligence for the entire industry — not just consumers of it.
+12. Executive and Board-Level Cyber Risk Scoring
+CISOs will face real consequences for failures in 2026, including stalled career progression — cybersecurity will become a shared responsibility across the C-suite. Boards will demand transparency, proactive risk management, and demonstrable outcomes. Dark Reading
+Every board of directors now needs a single number that answers the question "how secure are we?" ZERLAL generates a dynamic Cyber Risk Score — a 0-1000 number, updated in real time, that quantifies the organization's total security posture. It breaks down by category (code security, infrastructure, supply chain, device hygiene, human factors), shows trend over time, benchmarks against industry peers, and automatically generates the slide deck a CISO presents to their board every quarter. This one feature will be the reason every Fortune 500 company buys ZERLAL.
+13. Incident Response Command Center
+When a phishing message is flagged, within seconds an automated workflow quarantines the email, enriches the alert with threat intelligence, scans the recipient's endpoint, resets credentials as a precaution, enforces step-up authentication, logs the entire incident chain, and notifies the user — total time under a minute with zero analyst involvement for tier-one resolution. Torq ZERLAL should replicate this entire workflow natively — not requiring five separate tools stitched together.
+When ZERLAL detects an active intrusion, it does not just alert. It activates a full response command center: it isolates affected systems, preserves forensic artifacts, generates a real-time incident timeline, auto-drafts the breach notification required by GDPR/HIPAA/SEC rules, and assigns remediation tasks to the right team members with priority rankings. It is both the detection system and the response system, unified.
+14. Vibe Code Security — IDE Plugin
+Claude Cowork's promise is that just as "vibe coding" let non-programmers ship software by describing what they wanted, "vibe working" could let anyone produce polished outputs. Medium The future of software development is natural language to code. Every developer in 2026 and beyond will write code by describing what they want. ZERLAL's IDE plugin sits inside VS Code, Cursor, JetBrains, and every major editor and provides a real-time security co-pilot — not just linting for known patterns, but reasoning about the security implications of what the developer is building, suggesting secure alternatives, and blocking the commit if a critical vulnerability is introduced. It is a security expert sitting next to every developer on the planet.
+15. Geopolitical Threat Scenario Modeling
+Nation-state actors will increasingly work with each other to support intelligence collection, strategic disruption, and operations timed around global events — hybrid warfare that blends cyberattacks, misinformation, and kinetic effects. SC Media
+ZERLAL should offer a scenario modeling engine — a simulation environment where an organization (or a government's national security team) can model: "If China escalates over Taiwan, what are the most likely cyberattack vectors against our infrastructure? Which of our systems are most exposed? What is the estimated time to exploitation for our top 10 vulnerabilities if a nation-state prioritized us?" This is a war-gaming tool for cyber defense. No commercial product offers anything close to this. Defense ministries will pay whatever it costs.
+
+THE COMPLETE FEATURE STACK — Nothing Left Out
+To summarize every layer ZERLAL needs to be the undisputed number one:
+Code & Software Layer: ZIP/GitHub/binary upload, parallel agent swarm, exploit chaining, zero-day discovery, patch generation, AI-generated code auditing, IDE plugin, supply chain SBOM monitoring.
+Infrastructure Layer: Cloud misconfiguration scanning, container security, network topology mapping, OT/ICS/SCADA scanner, firmware analysis, quantum cryptography audit.
+Intelligence Layer: Dark web monitoring, nation-state attribution, CVE feed integration, MITRE ATT&CK mapping, geopolitical scenario modeling.
+Operations Layer: SIEM integration, SOC automation, SOAR workflows, UEBA behavioral analytics, insider threat detection, incident response command center.
+Device Layer: Mobile/tablet security scan, permission auditing, certificate store analysis, OS vulnerability check, multi-device enterprise management.
+Compliance & Governance Layer: Auto-generated compliance reports (NIST, FedRAMP, HIPAA, GDPR, SOC2, ISO27001, EU Cyber Resilience Act), SBOM generation, CVD disclosure pipeline, executive risk scoring, board-ready dashboards.
+Deployment Layer: Cloud SaaS, on-premise enterprise, sovereign air-gap mode, multi-tenant MSSP architecture.
+
+ZERLAL — AUREON's Cyber Intelligence Engine
+Competitive Reverse Engineering + Full Feature Blueprint
+
+What They're Actually Building (Glasswing Decoded)
+Their core stack is: LLM + agentic scaffold + isolated container + ASan crash oracle + parallel file-ranked agents. That's it. The magic isn't the architecture, it's the model reasoning. Here's what they do step by step:
+
+Spin an isolated container with the target codebase
+Ask Claude to rank every file 1–5 by exploit likelihood
+Run parallel agents — one per high-ranked file
+Each agent reads code, hypothesizes a vuln, runs the binary to confirm, outputs a PoC
+A final validator agent filters noise
+Human triagers review only the top-severity hits
+
+They are NOT doing anything structurally revolutionary. ZERLAL can replicate and exceed this. Here's how you beat them:
+
+ZERLAL Full Feature Architecture
+INPUT METHODS (How Users Feed Code Into ZERLAL)
+ZIP File Upload — User zips their entire codebase, uploads it. ZERLAL unpacks, indexes, and begins the scan pipeline. Support any language, any project size.
+GitHub / GitLab / Bitbucket Link — User pastes a repo URL. ZERLAL clones it, indexes it, and begins immediately. Private repos supported via OAuth token.
+Direct Code Paste — For single files or snippets. Instant scan, no project context needed.
+Live Repository Monitoring — Connect your GitHub org and ZERLAL watches every commit and pull request in real time. Every push gets auto-scanned before merge.
+Docker Image / Container Scan — Upload a container image. ZERLAL scans the filesystem, configs, dependency layers, and running process attack surface.
+API Endpoint Scan — Paste a Swagger/OpenAPI spec or live API URL. ZERLAL probes every endpoint for IDOR, auth bypass, injection, and rate limit flaws.
+Binary / Compiled File Upload — Upload stripped binaries. ZERLAL reverse-engineers them, reconstructs pseudo-source, then hunts vulns. This is exactly what Glasswing does on closed-source targets.
+
+THE SCAN ENGINE — What ZERLAL Does Internally
+Phase 1 — File Intelligence Ranking
+Every file in the project gets scored 1–5 for exploit surface likelihood. Files handling network input, auth, parsing, memory, or crypto rank highest. ZERLAL processes highest-risk files first.
+Phase 2 — Parallel Agent Swarm
+Multiple AI agents spin up simultaneously, each assigned to a different high-risk file. They read the code, hypothesize vulnerabilities, mentally simulate execution paths, and generate findings. This mirrors the Glasswing scaffold exactly — except yours should be faster and more configurable.
+Phase 3 — Exploit Confirmation
+For each finding, ZERLAL attempts to construct a proof-of-concept. It doesn't just say "there might be a buffer overflow here" — it builds the exploit chain and validates it. Severity is assessed by exploitability, not just existence.
+Phase 4 — Vulnerability Chaining
+This is the capability that separates Mythos from everything before it, and ZERLAL must have it. A single vuln may be low-risk alone. ZERLAL maps how 2, 3, or 4 vulnerabilities can be chained together to achieve a critical outcome like privilege escalation, RCE, or sandbox escape. This is the feature that eliminates every legacy scanner on the market.
+Phase 5 — Validator Agent
+A final agent reviews all findings and filters out noise, false positives, and low-value reports. Only high-confidence, high-severity hits surface to the dashboard.
+Phase 6 — Patch Generation
+For every confirmed vulnerability, ZERLAL generates the exact code fix. Not a suggestion — the actual patched code, ready to commit. This is the feature governments will pay for.
+
+VULNERABILITY CATEGORIES ZERLAL MUST COVER
+Memory safety: buffer overflows, use-after-free, double-free, heap spray, stack smashing, ROP chains, race conditions, integer overflow, null pointer dereference.
+Logic bugs: authentication bypasses, authorization flaws, IDOR, CSRF, business logic gaps, KASLR bypasses, privilege escalation paths.
+Injection: SQL, command, path traversal, SSRF, XSS, LDAP, XPath, prompt injection.
+Cryptographic weaknesses: weak key generation, IV reuse, algorithm confusion, certificate bypass, TLS misconfiguration, SSH flaws.
+Dependency and supply chain: known CVEs in imported libraries, typosquatted packages, dependency confusion attacks, outdated SBOM entries.
+Infrastructure misconfigurations: exposed ports, over-privileged IAM roles, public S3 buckets, container escape vectors, zero-trust violations.
+Zero-days: novel findings not in any CVE database. This is the crown jewel. ZERLAL should flag when a finding has no known CVE match — this is your government contract lever.
+
+PATTERN RECOGNITION ENGINE
+Beyond finding individual bugs, ZERLAL builds a pattern map across your entire codebase and across all scans run on the platform. It identifies:
+
+Recurring vulnerability classes (e.g., "you consistently mishandle input validation in async functions")
+Developer-level patterns (if you connect Git, ZERLAL can show which developer introduced the most security debt)
+Cross-project patterns (enterprise tier: "this vuln class appeared in 3 of your 7 repos")
+Temporal drift (new code introduces more vulns than old code — regression tracking)
+Architectural risk clusters (whole subsystems that are structurally more dangerous than others)
+
+
+COMPETITIVE DIFFERENTIATORS — What Puts Glasswing Out of Business
+Autonomous exploit generation at scale — Not just finding the vuln but proving it's real with a working PoC. Glasswing does this internally. ZERLAL does it for every customer.
+Chained exploit mapping — Visual graph showing how 3 separate medium-severity bugs become one critical RCE chain. No other commercial tool does this.
+Zero-day confidence scoring — A proprietary score showing how likely a finding is to be a genuine novel zero-day vs a known class. This is the number governments care about.
+Continuous monitoring, not point-in-time scans — Glasswing runs a one-time scan. ZERLAL watches forever. Every commit, every dependency update, every config change triggers a re-scan.
+Natural language scan reports — Findings written in plain English for executives, and full technical PoC for engineers. Same scan, two audience outputs automatically.
+Remediation SLA tracking — ZERLAL tracks whether your team actually fixed the vuln and how long it took. Generates compliance-ready audit trails.
+
+DEVICE SECURITY SCAN — Phone / Tablet Integration
+This is an insane feature idea and yes, it's buildable. Here's how it works and what to build:
+How it connects: The AUREON mobile app (iOS + Android) acts as the on-device agent. When a user consents and taps "Scan My Device," the app runs a local security assessment and sends the findings to the ZERLAL dashboard. Critically, the scan logic runs on-device — raw data never leaves the phone. Only the structured findings report is transmitted.
+What the on-device scan checks:
+OS version and patch level — is the device running a version with known unpatched CVEs?
+Installed apps — cross-references installed app list against known malicious apps, apps with CVE history, apps requesting dangerous permissions they don't need.
+Permission audit — which apps have access to camera, microphone, location, contacts, and SMS. Flags anything suspicious (a flashlight app with microphone access).
+Network security — detects if the device is on an open/unencrypted WiFi, detects rogue access points or MITM indicators, checks VPN status.
+Certificate store — scans for untrusted or compromised root certificates installed on the device (a common enterprise attack vector).
+Bluetooth exposure — active pairable devices, known vulnerable Bluetooth profiles.
+Backup and encryption status — is full-disk encryption enabled? Are cloud backups encrypted? Is the lock screen enforcing a strong auth method?
+Sideloaded / unknown source apps (Android) — flags any APKs installed outside the official store.
+Developer mode and USB debugging — flags if developer options are enabled (major attack surface).
+jailbreak / root detection — flags rooted or jailbroken devices, which bypass all OS-level sandboxing.
+Dashboard features for device scans:
+Each device appears as a card in the AUREON dashboard with a security score (0–100), last scan time, and a risk level badge (Safe / Moderate / Critical).
+Drill into any device to see every finding broken down by category. Each finding has a plain English explanation and a one-tap action to fix it (e.g., "Revoke camera access from this app → takes you directly to system settings").
+Scan history — full timeline of every past scan, showing how the device's security posture changed over time. User can delete any scan from history.
+Multi-device management — enterprise feature where an IT admin can see all enrolled employee devices on one screen.
+Alerts — push notification if a new CVE drops that affects your device's OS version. You know about it the same day it's published.
+Privacy controls users need:
+Explicit consent screen before every scan, written in plain language not legalese.
+Toggle to exclude any app category from the scan (e.g., "don't scan my banking apps").
+One-tap delete for any individual scan result or full scan history.
+Local-only mode — premium option where zero data leaves the device. Findings are only visible on-device and never sync to the cloud.
+Data retention settings — auto-delete scans older than 30/60/90 days.
+
+GOVERNMENT / ENTERPRISE FEATURES (The contracts that make competitors irrelevant)
+CVD (Coordinated Vulnerability Disclosure) Pipeline — Built-in workflow to report findings to software vendors with auto-generated professional CVD reports, tracking of disclosure status, and 90-day countdown timers. This is exactly what Glasswing built internally — you're giving it to every customer.
+SBOM Generation and Monitoring — Automatically generate a Software Bill of Materials for any uploaded codebase. Monitor every dependency for new CVEs in real time. This is now legally required for US federal contractors under Executive Order 14028.
+Compliance Mapping — Every finding mapped to the relevant compliance framework: NIST 800-53, SOC 2, ISO 27001, FedRAMP, HIPAA, PCI-DSS. One-click compliance report generation.
+Air-Gap Mode — For classified environments. ZERLAL runs entirely on-premise, no external network calls. Government agencies will not send code to a cloud service. You need an on-prem deployment option or you don't get the contract.
+Multi-Tenant Architecture with Role-Based Access — Enterprise customers need to segment by team, project, or division. A developer sees their own project findings. A CISO sees everything across the org. An auditor gets read-only access to compliance reports only.
+SLA and Remediation Reporting — Track mean-time-to-remediation per team, per vuln class, per severity level. Show trends over time. This is what a CISO presents to their board.
+
+UI/UX DESIGN CONCEPT
+Home Dashboard: A real-time risk posture score for the entire organization displayed prominently at the top. Below it, a live feed of the most recent scan findings sorted by severity. A heat map of the codebase showing which repos and files carry the most risk. Active scans shown with a live progress indicator.
+Scan Submission Screen: Three clear tabs at the top — ZIP Upload, GitHub Link, Paste Code. Drag-and-drop zone for the ZIP. Clean input field for the GitHub URL with OAuth connect button. A code editor pane for direct paste. Below the input, a "Scan Configuration" panel where users pick depth (Quick / Standard / Deep), which vuln categories to include, and whether to generate PoC exploits or findings-only.
+Active Scan View: A live progress screen showing each parallel agent as it works through files. You can see "Agent 7 — analyzing auth/session.c — 3 findings so far." A running count of findings appearing in real time as agents report back.
+Findings Report: Each finding is a card with a severity badge (Critical / High / Medium / Low), the file and line number, a plain English explanation, the technical PoC, and the exact patch code. Cards are filterable and sortable. A "Chain Map" button on critical findings opens a visual graph showing how that finding connects to others in an exploit chain.
+Device Scan Screen (Mobile): A simple, clean interface with a large "Scan My Device" button at center. After scan, a score circle animates to the result. Below it, findings are organized into collapsible categories. Each finding has a severity dot, a one-sentence explanation, and a "Fix This" button.
+Settings and Privacy Panel: Clear toggles for every data permission. Scan history list with individual and bulk delete. Export options for every report (PDF, JSON, CSV). Notification preferences.
+
+This is your blueprint. ZERLAL built to this spec doesn't compete with Glasswing — it makes Glasswing's closed-consortium model look like a private club while ZERLAL is the global standard. When you're ready to build, say the word and we architect the technical stack.

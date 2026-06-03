@@ -37,11 +37,28 @@ Default categories: **weather** and **crypto** (configurable).
 | Crypto | [CoinGecko](https://www.coingecko.com/) spot + 24h change |
 | General | [Tavily](https://tavily.com/) search (optional API key) |
 
-## Brains
+## Brains (Aureon corpus)
 
-Drop your `.txt` or `.md` brain files into the `brains/` folder. They are loaded at startup into the AI system prompt.
+The bot loads the **full Aureon agent brain corpus** you trained on. Brains live in `brains/`:
 
-Replace or extend `brains/axrlen_default_brain.txt` with your own Aureon/Zophiel/trading brains.
+| Path | Contents |
+|------|----------|
+| `brains/aureon/` | All `.txt`/`.md` files copied from your Aureon Files folder |
+| `brains/aureon/extracted/` | Text extracted from Aureon PDFs (sports, trading, vedic, prompt engineering) |
+| `brains/BRAIN_MANIFEST.md` | Aureon manifest (load priority reference) |
+| `brains/axrlen_default_brain.txt` | Axrlen betting-specific rules |
+
+Load order follows **Aureon manifest priority**: hard constraints → betting/trading → prediction → prompt engine → rest.
+
+Re-import after updating your local Aureon Files:
+
+```bash
+python scripts/import_aureon_brains.py
+# or from a custom path:
+python scripts/import_aureon_brains.py "D:/path/to/Aureon Files"
+```
+
+Tune token budget with `BRAINS_MAX_CHARS` (default `250000`).
 
 ## Quick start (local)
 
@@ -73,7 +90,8 @@ python main.py
 | `RESOLUTION_WINDOW_HOURS` | `24` | Only markets ending within this window |
 | `MARKET_CATEGORIES` | `weather,crypto` | Comma-separated categories |
 | `TAVILY_API_KEY` | — | Optional web search |
-| `BRAINS_DIR` | `./brains` | Custom brains path |
+| `BRAINS_DIR` | `./brains` | Brains path (includes Aureon corpus) |
+| `BRAINS_MAX_CHARS` | `250000` | Max chars loaded into AI system prompt |
 
 ## Railway deploy
 

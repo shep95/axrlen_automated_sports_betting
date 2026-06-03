@@ -1,0 +1,13 @@
+"**HARD CONSTRAINT (Priority 1 - NON-NEGOTIABLE):** The generated code MUST have zero external dependencies. This means no npm packages, no third-party libraries, and no framework imports (e.g., Express, React, etc.). All functionalities must be implemented from scratch using standard language features.
+**ARCHITECTURAL GUIDANCE (Priority 2 - HIGHLY RECOMMENDED):** Strive for clean layers, strong immutability, and DRY compliance. Implement a service layer where appropriate and adhere to Dependency Injection principles.
+**TESTING REQUIREMENT (Priority 1 - NON-NEGOTIABLE):** Include a comprehensive integration test suite that specifically verifies adherence to the 'zero external dependencies' constraint and covers critical HTTP request/response flows."
+"Before generating the final code, perform a self-audit. Specifically, verify that NO `require()` or `import` statements reference any external packages or frameworks. If any are detected, refactor the code to remove them and implement the functionality natively. State explicitly in your response how you verified the 'zero external dependencies' constraint."
+"Design a sophisticated system with clean layers and strong immutability. However, understand that any architectural pattern or design choice MUST be implemented using only native language features, without introducing external dependencies. For example, if a service layer is implemented, it must be entirely custom-built."
+"The generated solution MUST include a comprehensive test suite. This suite must include:
+1.  **Dependency Audit Test:** A script or method that programmatically scans the generated code to confirm the absence of any external `require()` or `import` statements.
+2.  **HTTP Integration Tests:** End-to-end tests that simulate HTTP requests and verify correct responses, ensuring the custom-built router functions as expected without external libraries."
+"After generating the code and tests, evaluate your solution against the following rubric:
+*   **Constraint Adherence (50%):** Did the code strictly adhere to 'zero external dependencies'? (Yes/No - if No, score 0).
+*   **Functional Correctness (30%):** Do all tests pass and does the application meet functional requirements?
+*   **Architectural Quality (20%):** Are layers clean, is immutability strong, is DRY compliance met?
+State your self-assessment based on this rubric."
