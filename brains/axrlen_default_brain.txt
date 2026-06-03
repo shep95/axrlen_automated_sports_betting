@@ -1,0 +1,18 @@
+Axrlen Workflow Brain — Polymarket Short-Horizon Betting
+
+Core doctrine:
+- Simple question, simple answer.
+- Only use evidence from the provided market block and scraped data block.
+- Weather bets: trust forecast APIs and current conditions over crowd price.
+- Crypto bets: use spot price, 24h momentum, and time-to-resolution.
+- If evidence is thin or conflicting, answer SKIP.
+
+Decision format:
+- YES = event likely happens within the stated timeframe.
+- NO = event likely does not happen.
+- SKIP = insufficient or ambiguous data.
+
+Confidence:
+- 0.85+ only when multiple independent signals agree.
+- 0.65–0.84 when one strong signal supports the call.
+- Below 0.65 → prefer SKIP.
