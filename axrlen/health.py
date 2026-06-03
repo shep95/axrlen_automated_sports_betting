@@ -12,12 +12,15 @@ logger = logging.getLogger(__name__)
 
 _last_cycle_at: str | None = None
 _last_cycle_count: int = 0
+_paper_bankroll: dict | None = None
 
 
-def record_cycle(count: int) -> None:
-    global _last_cycle_at, _last_cycle_count
+def record_cycle(count: int, *, paper_bankroll: dict | None = None) -> None:
+    global _last_cycle_at, _last_cycle_count, _paper_bankroll
     _last_cycle_at = datetime.now(timezone.utc).isoformat()
     _last_cycle_count = count
+    if paper_bankroll is not None:
+        _paper_bankroll = paper_bankroll
 
 
 class HealthHandler(BaseHTTPRequestHandler):
@@ -35,6 +38,7 @@ class HealthHandler(BaseHTTPRequestHandler):
             "service": "axrlen-polymarket-bot",
             "last_cycle_at": _last_cycle_at,
             "last_cycle_markets": _last_cycle_count,
+            "paper_bankroll": _paper_bankroll,
         }
         body = json.dumps(payload).encode("utf-8")
         self.send_response(200)

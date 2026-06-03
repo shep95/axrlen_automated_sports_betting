@@ -206,6 +206,35 @@ class GammaClient:
                 markets.append(market)
         return markets
 
+    def fetch_market_raw(self, market_id: str) -> dict[str, Any] | None:
+        """Fetch a single market payload by id for settlement checks."""
+        if not market_id:
+            return None
+        urls = (
+            f"{GAMMA_BASE}/markets/{market_id}",
+            f"{GAMMA_BASE}/markets",
+        )
+        with httpx.Client(timeout=self._timeout) as client:
+            try:
+                response = client.get(urls[0])
+                if response.status_code == 200:
+                    payload = response.json()
+                    if isinstance(payload, dict):
+                        return payload
+            except httpx.HTTPError as exc:
+                logger.debug("Gamma market by path failed for %s: %s", market_id, exc)
+
+            try:
+                response = client.get(urls[1], params={"id": market_id, "limit": 1})
+                response.raise_for_status()
+                payload = response.json()
+                if isinstance(payload, list) and payload:
+                    item = payload[0]
+                    return item if isinstance(item, dict) else None
+            except httpx.HTTPError as exc:
+                logger.warning("Gamma market fetch failed for %s: %s", market_id, exc)
+        return None
+
     def search_markets(self, query: str, limit: int = 20) -> list[PolymarketMarket]:
         url = f"{GAMMA_BASE}/public-search"
         params = {"q": query, "limit": limit}

@@ -14,6 +14,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 BRAINS_DIR = PROJECT_ROOT / "brains"
 DATA_DIR = PROJECT_ROOT / "data"
 JOURNAL_PATH = DATA_DIR / "bet_journal.jsonl"
+PAPER_BANKROLL_PATH = DATA_DIR / "paper_bankroll.json"
 
 
 @dataclass(frozen=True)
@@ -26,6 +27,11 @@ class Settings:
     polymarket_funder_address: str
     polymarket_signature_type: int
     bet_size_usd: float
+    paper_starting_capital: float
+    paper_min_bet_usd: float
+    paper_max_bet_usd: float
+    paper_compound_threshold_usd: float
+    paper_compound_pct: float
     min_confidence: float
     max_markets_per_cycle: int
     scan_interval_minutes: int
@@ -102,13 +108,20 @@ def load_settings() -> Settings:
 
     return Settings(
         openai_api_key=openai_key,
-        openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip() or "gpt-4o-mini",
+        openai_model=os.getenv("OPENAI_MODEL", "gpt-5.2").strip() or "gpt-5.2",
         live_trading=live,
         paper_trading=paper if not live else False,
         polymarket_private_key=os.getenv("POLYMARKET_PRIVATE_KEY", "").strip(),
         polymarket_funder_address=os.getenv("POLYMARKET_FUNDER_ADDRESS", "").strip(),
         polymarket_signature_type=_env_int("POLYMARKET_SIGNATURE_TYPE", 3, 0, 3),
         bet_size_usd=_env_float("BET_SIZE_USD", 5.0, 1.0, 1000.0),
+        paper_starting_capital=_env_float("PAPER_STARTING_CAPITAL", 100.0, 10.0, 100_000.0),
+        paper_min_bet_usd=_env_float("PAPER_MIN_BET_USD", 5.0, 1.0, 1000.0),
+        paper_max_bet_usd=_env_float("PAPER_MAX_BET_USD", 50.0, 1.0, 1000.0),
+        paper_compound_threshold_usd=_env_float(
+            "PAPER_COMPOUND_THRESHOLD_USD", 300.0, 50.0, 100_000.0
+        ),
+        paper_compound_pct=_env_float("PAPER_COMPOUND_PCT", 0.10, 0.01, 1.0),
         min_confidence=_env_float("MIN_CONFIDENCE", 0.65, 0.5, 0.99),
         max_markets_per_cycle=_env_int("MAX_MARKETS_PER_CYCLE", 3, 1, 20),
         scan_interval_minutes=_env_int("SCAN_INTERVAL_MINUTES", 7, 5, 10),

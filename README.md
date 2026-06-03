@@ -187,7 +187,7 @@ Railway reads `railway.toml` + `Dockerfile`. The Aureon brains ship with the rep
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `OPENAI_API_KEY` | — | **Required** |
-| `OPENAI_MODEL` | `gpt-4o-mini` | Decision model |
+| `OPENAI_MODEL` | `gpt-5.2` | Decision model |
 | `PAPER_TRADING` | `true` | Simulate bets |
 | `LIVE_TRADING` | `false` | Real CLOB orders |
 | `AXRLEN_CONFIRM_LIVE_RISK` | `false` | Must be `true` for live |

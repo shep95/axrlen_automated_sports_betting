@@ -106,3 +106,4 @@ class BetExecutionResult(BaseModel):
     paper: bool = True
     message: str = ""
     correlation_id: str = ""
+    bankroll: dict[str, float | int | bool | str] | None = None

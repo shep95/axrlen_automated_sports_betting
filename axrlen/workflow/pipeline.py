@@ -71,12 +71,20 @@ class WorkflowPipeline:
             "reasoning": verdict.reasoning,
             "bet_success": execution.success if execution else False,
             "bet_paper": execution.paper if execution else True,
+            "bet_size_usd": execution.size_usd if execution else 0.0,
+            "bet_price": execution.price if execution else 0.0,
             "bet_message": execution.message if execution else "",
+            "bankroll": execution.bankroll if execution else None,
         }
         self._journal(record)
         return record
 
     def run_cycle(self) -> list[dict]:
+        if self._settings.paper_trading or not self._settings.is_live:
+            settled = self._trader.settle_paper_positions()
+            if settled:
+                logger.info("Settled %d paper position(s) this cycle", settled)
+
         markets = self._scanner.scan()
         if not markets:
             logger.info("No qualifying markets this cycle")
@@ -88,4 +96,8 @@ class WorkflowPipeline:
                 results.append(self.process_market(market))
             except Exception as exc:
                 logger.exception("Market processing failed: %s", exc)
+
+        if (self._settings.paper_trading or not self._settings.is_live) and self._trader.paper_bankroll:
+            self._trader.paper_bankroll.log_summary(context="CYCLE-END")
+
         return results

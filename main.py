@@ -44,6 +44,7 @@ def main() -> None:
 
     start_health_server(settings.health_port)
     pipeline = WorkflowPipeline(settings)
+    pipeline._trader.log_paper_bankroll_startup()
 
     signal.signal(signal.SIGINT, _handle_signal)
     signal.signal(signal.SIGTERM, _handle_signal)
@@ -51,7 +52,10 @@ def main() -> None:
     while not _shutdown:
         try:
             results = pipeline.run_cycle()
-            record_cycle(len(results))
+            bankroll_snap = None
+            if pipeline._trader.paper_bankroll:
+                bankroll_snap = pipeline._trader.paper_bankroll.snapshot()
+            record_cycle(len(results), paper_bankroll=bankroll_snap)
             logger.info("Cycle complete — processed %d markets", len(results))
         except Exception as exc:
             logger.exception("Cycle failed: %s", exc)
